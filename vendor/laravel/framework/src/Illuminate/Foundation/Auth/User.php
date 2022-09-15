@@ -17,4 +17,5 @@ class User extends Model implements
     CanResetPasswordContract
 {
     use Authenticatable, Authorizable, CanResetPassword, MustVerifyEmail;
+    protected $with = ['user_kampus','user_kampus.kampus'];
 }

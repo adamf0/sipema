@@ -32,4 +32,12 @@ class KampusItemBayar extends Model
     {
         return $this->hasOne(MasterItem::class,'id','id_item');
     }
+    public function prodi()
+    {
+        return $this->hasOne(KampusProdi::class,'id','id_prodi');
+    }
+    public function kelompok()
+    {
+        return $this->hasOne(MasterKelompok::class,'id','id_kelompok');
+    }
 }

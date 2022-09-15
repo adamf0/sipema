@@ -8,7 +8,7 @@
     <script>
         $('#textTable').margetable({
             type: 2,
-            colindex: [0,1,2]
+            colindex: [0,1,2,3,4]
         });
     </script>
 @endpush
@@ -23,6 +23,8 @@
                 <tr>
                     <th>Tahun Akademik</th>
                     <th>Gelombang</th>
+                    <th>Prodi</th>
+                    <th>Kelompok</th>
                     <th>Item</th>
                     <th>Total Bayar</th>
                     <th>Angsuran</th>
@@ -32,10 +34,24 @@
             <tbody>
                 @foreach ($item_bayars as $index => $item_bayar)
                     <tr>
-                        <td>{{ \Carbon\Carbon::parse($item_bayar->tahun_akademik)->format('Ym') }}</td>
+                        <td>{{ $item_bayar->tahun_akademik }}</td>
                         <td>{{ $item_bayar->gelombang->nama_gelombang }}</td>
+                        <td>{{ $item_bayar->prodi->nama }}</td>
+                        <td>{{ $item_bayar->kelompok->nama }}</td>
                         <td>{{ $item_bayar->item->nama }}</td>
-                        <td>Rp {{ number_format($item_bayar->total_bayar, 2, ',', '.') }}</td>
+                        <td>
+                            Rp {{ number_format($item_bayar->total_bayar, 2, ',', '.') }}<br>
+                            @if ($item_bayar->total_bayar==$item_bayar->nominal)
+                                <label class="badge bg-success">Valid</label>
+                            @else
+                                <label class="badge bg-danger">Tidak Valid ({{$item_bayar->nominal-$item_bayar->total_bayar}})</label>
+                            @endif
+                            @if ($item_bayar->type==1)
+                                <label class="badge bg-primary">Auto Generate</label>
+                            @else
+                                <label class="badge bg-secondary">Custom</label>
+                            @endif
+                        </td>
                         <td>x{{ $item_bayar->jumlah_angsuran }}</td>
                         <td>
                             <div class="d-flex gap-2">

@@ -34,4 +34,9 @@ class KampusProdi extends Model
     {
         return $this->hasOne(MasterKampus::class, 'id', 'id_kampus');
     }
+
+    public function kampus_item_bayar()
+    {
+        return $this->belongsTo(KampusItemBayar::class, 'id_kelompok', 'id');
+    }
 }

@@ -104,7 +104,7 @@ trait AuthenticatesUsers
     protected function sendLoginResponse(Request $request)
     {
         $request->session()->regenerate();
-        $this->guard()->user()->load(['user_kampus','user_kampus.kampus']);
+        $this->guard()->user();
         if(count($this->guard()->user()->user_kampus)>0 && !Session::has('id_kampus')){
             Session::put('id_kampus',$this->guard()->user()->user_kampus[0]->kampus->id);
             Session::put('nama_kampus',$this->guard()->user()->user_kampus[0]->kampus->nama_kampus);
