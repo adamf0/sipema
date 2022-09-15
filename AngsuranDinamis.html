@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+</head>
+<body>
+
+<table id="table">
+  	<thead>
+  		<tr>
+	    	<th>
+	    		<label>Cicilan</label><br>
+	    		<input type="text" name="total_angsuran[]" />
+	    	</th>
+	  	</tr>
+  	</thead>
+  	<tbody>
+  		
+  	</tbody>
+</table>
+
+<button type="button" class="btn-add">add column</button>
+<button type="button" class="btn-gen">generate</button>
+
+</body>
+<script type="text/javascript">
+	// generate_table();
+	const addColumn = () => {
+	  for (const [i, row] of [...document.querySelectorAll('#table thead tr')].entries()) {
+	    const label = document.createElement("label")
+	    label.innerHTML = "Cicilan"
+
+	    const br = document.createElement("br")
+
+	    const input = document.createElement("input")
+	    input.setAttribute('type', 'text')
+	    input.setAttribute('name', 'total_angsuran[]')
+	    const cell = document.createElement(i ? "td" : "th")
+	    
+	    cell.appendChild(label)
+	    cell.appendChild(br)
+	    cell.appendChild(input)
+	    row.appendChild(cell)
+	  };
+	}
+	const generate = () => {
+	  var values = $("input[name='total_angsuran[]']").map(function(){return parseInt($(this).val()); }).get();
+	  console.log(values);
+	  generate_table(values);
+	}
+	document.querySelector('.btn-add').onclick = addColumn
+	document.querySelector('.btn-gen').onclick = generate
+	
+
+	function arrayMax(arr) {
+  		return arr.reduce(function (p, v) {
+    		return ( p > v ? p : v );
+  		});
+	}
+	function transpose(array) {
+	    return array.reduce((prev, next) => next.map((item, i) =>
+	        (prev[i] || []).concat(next[i])
+	    ), []);
+	}
+
+	function generate_table(angsuran) {
+  		var tbl = document.querySelector('#table');
+  		var tblBody = document.querySelector('#table tbody');
+  		$("#table tbody tr").remove()
+  		
+	  	// var angsuran = [12,24,8,36];
+  		var x = new Array(angsuran.length);
+	
+		for (var i = 0; i < x.length; i++) {
+	  		x[i] = new Array(arrayMax(angsuran));
+		}
+		for (var i = 0; i < x.length; i++) {
+		  	for (var j = 0; j < x[i].length; j++) {
+		  		if(j+1<=angsuran[i]){
+		  			x[i][j] = 0;
+		  		}	
+		  		else{
+		  			x[i][j] = null;
+		  		}
+			}	
+		}		
+		console.log(x);
+		x = transpose(x);
+
+	  	for (var i = 0; i < x.length; i++) {
+	    	var row = document.createElement("tr");
+	    	for (var j = 0; j < x[i].length; j++) {
+	      		var cell = document.createElement("td");
+	      		var cellText = document.createTextNode('asa');
+	      		
+	      		if(x[i][j] != null){
+	      			cell.innerHTML = "<input type='text' style='background: #e8e8e8;' name='anggaran["+angsuran[i]+"]["+i+"]["+j+"]'>"
+	      		}
+	      		row.appendChild(cell);
+	    	}
+	    	tblBody.appendChild(row);
+	  	}
+	  	tbl.appendChild(tblBody);
+	  	tbl.setAttribute("border", "2");
+}
+</script>
+</html>
