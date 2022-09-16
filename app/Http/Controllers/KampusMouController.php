@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\KampusMou;
 use App\MasterKampus;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
-use Session;
 
 class KampusMouController extends Controller
 {
@@ -14,7 +14,6 @@ class KampusMouController extends Controller
     public $kampus = [];
     public function __construct()
     {
-        
     }
     /**
      * Display a listing of the resource.
