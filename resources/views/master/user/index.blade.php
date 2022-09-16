@@ -13,9 +13,9 @@
                     <th>ID</th>
                     <th>Nama Penguna</th>
                     <th>Email</th>
-                    <th>Akses</th>
+                    <th>Hak Akses</th>
                     <th>Management Kampus</th>
-                    <th>Email</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -25,18 +25,20 @@
                         <td>{{ $user->name }}</td>
                         <td>{{ $user->email }}</td>
                         <td>
-                            @forelse ($user->roles as $role)
-                                <li>{{ $role->name }}</li> 
-                            @empty
-                                Tidak ada role
-                            @endforelse
+                            <ul>
+                                @forelse ($user->roles as $role)
+                                    <li>{{ $role->name }}</li>
+                                @empty
+                                    Tidak ada role
+                                @endforelse
+                            </ul>
                         </td>
                         <td>
                             <ul>
                                 @forelse ($user->user_kampus as $user_kampus)
-                                    <li>{{ $user_kampus->kampus->nama_kampus }}</li> 
+                                    <li>{{ $user_kampus->kampus->nama_kampus }}</li>
                                 @empty
-                                   Tidak ada kampus yang dimanagement
+                                    Tidak ada kampus yang dimanagement
                                 @endforelse
                             </ul>
                         </td>
