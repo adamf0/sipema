@@ -7,6 +7,7 @@ use App\User;
 use App\UserKampus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class MasterUserController extends Controller
@@ -87,7 +88,7 @@ class MasterUserController extends Controller
             $user = new User();
             $user->name = $request->nama;
             $user->email = $request->email;
-            $user->password = $request->password;
+            $user->password = Hash::make($request->password);
             $user->save();
             $user->assignRole($request->role);
 
@@ -184,7 +185,7 @@ class MasterUserController extends Controller
             $user->name = $request->nama;
             $user->email = $request->email;
             if( $request->password != "" ||  $request->password != null){
-                $user->password =  $request->password;
+                $user->password =  Hash::make($request->password);
             }
             $user->save();
             $user->syncRoles([$request->role]);
