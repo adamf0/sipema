@@ -30,7 +30,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('mou', 'KampusMouController')->parameter('mou', 'kampus_mou');
         Route::resource('prodi', 'KampusProdiController')->parameter('prodi', 'kampus_prodi');
         Route::resource('item-bayar', 'KampusItemBayarController')->parameter('item-bayar', 'kampus_item_bayar');
-        Route::resource('gelombang', 'KampusGelombangController')->parameter('gelombang', 'kampus_gelombang'); 
+        Route::resource('gelombang', 'KampusGelombangController')->parameter('gelombang', 'kampus_gelombang');
         Route::resource('pembayaran', 'KampusPembayaranController')->parameter('pambayaran', 'kampus_pembayaran');
         Route::resource('mahasiswa', 'KampusMahasiswaController')->parameter('mahasiswa', 'kampus_mahasiswa');
         Route::get('switch/{id_kampus}/{to}', function ($id_kampus, $to) {
@@ -45,25 +45,25 @@ Route::middleware(['auth'])->group(function () {
     });
     Route::resource('biaya-potongan', 'BiayaPotonganController')->parameter('biaya_potong', 'biaya_potongan');
     Route::prefix('jadwal_ulang')->group(function () {
-        Route::get('/', 'KampusJadwalUlangTagihan@index'); //untuk mahasiswa 
+        Route::get('/', 'KampusJadwalUlangTagihan@index'); //untuk mahasiswa
         Route::post('/', 'KampusJadwalUlangTagihan@create');  //untuk mahasiswa
         Route::post('/{id}', 'KampusJadwalUlangTagihan@update'); //untuk kampus/admin
         Route::get('/{id}', 'KampusJadwalUlangTagihan@delete'); //untuk mahasiswa
     });
-     
+
     Route::prefix('master')->name('master.')->group(function () {
         Route::resource('user', 'MasterUserController')->except('view')->parameter('user', 'user');
         Route::resource('item', 'MasterItemController')->except('view')->parameter('item', 'master_item');
         Route::resource('channel-pembayaran', 'MasterChannelPembayaranController')->except('view');
         Route::resource('kampus', 'MasterKampusController')->except('view')->parameter('kampus', 'master_kampus');
-         Route::resource('kelompok', 'MasterKelompokController')->parameter('kelompok', 'master_kelompok');
+        Route::resource('kelompok', 'MasterKelompokController')->parameter('kelompok', 'master_kelompok');
         Route::resource('tipe-biaya-potongan', 'MasterTipeBiayaPotonganController')->except('view')->parameter('tipe-biaya-potongan', 'master_tipe_biaya_potongan');
     });
 
     Route::prefix('detail-kampus/{kampus}')->name('detail-kampus.')->group(function () {
         Route::get('/', 'DetailKampusController@index')->name('dashboard');
         Route::resource('mou', 'AdminKampusMouController')->except('view');
-        Route::resource('prodi', 'KampusProdiController')->except('view');
+        Route::resource('prodi', 'AdminKampusProdiController')->except('view');
         Route::resource('item-bayar', 'KampusItemBayarController')->except('view');
         Route::resource('gelombang', 'KampusGelombangController')->except('view');
         Route::resource('pembayaran', 'KampusPembayaranController')->except('view');
