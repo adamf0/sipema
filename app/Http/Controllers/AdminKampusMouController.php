@@ -2,32 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\KampusProdi;
+use App\KampusMou;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
+use App\Http\Controllers\Controller;
+use App\MasterKampus;
 use Illuminate\Support\Facades\Validator;
 
-class KampusProdiController extends Controller
+class AdminKampusMouController extends Controller
 {
-    public $id_kampus = null;
-    public function __construct()
-    {
-        // $this->id_kampus = Session::get('id_kampus');
-    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(MasterKampus $kampus)
     {
-        $user = Auth::user();
-        // $user->load('user_kampus');
+        $kampusMous = KampusMou::where('id_kampus', $kampus->id)->simplePaginate(5);
 
-        $prodis = KampusProdi::whereKampus(Session::get('id_kampus'))->simplePaginate(5);
-
-        return view('kampus.prodi.index', ['prodis' => $prodis]);
+        return view('detail-kampus.mou.index', [
+            'kampus' => $kampus,
+            'kampusMous' => $kampusMous
+        ]);
     }
 
     /**
@@ -35,9 +30,11 @@ class KampusProdiController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(MasterKampus $kampus)
     {
-        return view('kampus.prodi.create');
+        return view('detail-kampus.mou.create', [
+            'kampus' => $kampus
+        ]);
     }
 
     /**
@@ -46,27 +43,24 @@ class KampusProdiController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(MasterKampus $kampus, Request $request)
     {
         $validator = Validator::make(
             $request->only([
-                'kode_prodi',
-                'nama',
-                'jenjang',
-                'masa_studi'
+                'no_mou',
+                'max_reschedule',
+                'status_gelombang'
             ]),
             [
-                'kode_prodi' => ['required', 'numeric'],
-                'nama' => ['required'],
-                'jenjang' => ['required'],
-                'masa_studi' => ['required', 'min:1'],
+                'no_mou' => ['required'],
+                'max_reschedule' => ['required', 'min:0', 'gte:0'],
+                'status_gelombang' => ['nullable', 'in:1'],
             ],
             [],
             [
-                'kode_prodi' => 'Kode Prodi',
-                'nama' => 'Nama Prodi',
-                'jenjang' => 'Jenjang',
-                'masa_studi' => 'Masa Studi',
+                'no_mou' => 'No. MOU',
+                'max_reschedule' => 'Max Reschedule',
+                'status_gelombang' => 'Status Gelombang',
             ]
         );
 
@@ -82,15 +76,15 @@ class KampusProdiController extends Controller
                 ->withInput();
         }
 
-        $kampusProdi = new KampusProdi();
-        $kampusProdi->id_kampus = Session::get('id_kampus');
-        $kampusProdi->kode_prodi = $request->kode_prodi;
-        $kampusProdi->nama = $request->nama;
-        $kampusProdi->jenjang = $request->jenjang;
-        $kampusProdi->masa_studi = $request->masa_studi;
-        $kampusProdi->save();
+        $kampusMou = new KampusMou();
+        $kampusMou->no_mou = $request->no_mou;
+        $kampusMou->id_kampus = $kampus->id;
+        $kampusMou->max_reschedule = $request->max_reschedule;
+        $kampusMou->status_gelombang = $request->status_gelombang ?? 0;
+        $kampusMou->tanggal_dibuat = now()->format('Y-m-d');
+        $kampusMou->save();
 
-        return redirect(route('kampus.prodi.index'))
+        return redirect(route('detail-kampus.mou.index', ['kampus' => $kampus->id]))
             ->with('flash_message', (object)[
                 'type' => 'success',
                 'title' => 'Sukses',
@@ -101,10 +95,10 @@ class KampusProdiController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\KampusProdi  $kampusProdi
+     * @param  \App\KampusMou  $kampusMou
      * @return \Illuminate\Http\Response
      */
-    public function show(KampusProdi $kampusProdi)
+    public function show(MasterKampus $kampus, KampusMou $mou)
     {
         abort(404);
     }
@@ -112,13 +106,14 @@ class KampusProdiController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\KampusProdi  $kampusProdi
+     * @param  \App\KampusMou  $mou
      * @return \Illuminate\Http\Response
      */
-    public function edit(KampusProdi $kampusProdi)
+    public function edit(MasterKampus $kampus, KampusMou $mou)
     {
-        return view('kampus.prodi.edit', [
-            'prodi' => $kampusProdi
+        return view('detail-kampus.mou.edit', [
+            'kampus' => $kampus,
+            'mou' => $mou
         ]);
     }
 
@@ -126,30 +121,27 @@ class KampusProdiController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\KampusProdi  $kampusProdi
+     * @param  \App\KampusMou  $mou
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, KampusProdi $kampusProdi)
+    public function update(MasterKampus $kampus, Request $request, KampusMou $mou)
     {
         $validator = Validator::make(
             $request->only([
-                'kode_prodi',
-                'nama',
-                'jenjang',
-                'masa_studi'
+                'no_mou',
+                'max_reschedule',
+                'status_gelombang'
             ]),
             [
-                'kode_prodi' => ['required', 'numeric'],
-                'nama' => ['required'],
-                'jenjang' => ['required'],
-                'masa_studi' => ['required', 'min:1'],
+                'no_mou' => ['required'],
+                'max_reschedule' => ['required', 'min:0', 'gte:0'],
+                'status_gelombang' => ['nullable', 'in:1'],
             ],
             [],
             [
-                'kode_prodi' => 'Kode Prodi',
-                'nama' => 'Nama Prodi',
-                'jenjang' => 'Jenjang',
-                'masa_studi' => 'Masa Studi',
+                'no_mou' => 'No. MOU',
+                'max_reschedule' => 'Max Reschedule',
+                'status_gelombang' => 'Status Gelombang',
             ]
         );
 
@@ -165,15 +157,17 @@ class KampusProdiController extends Controller
                 ->withInput();
         }
 
-        $kampusProdi->id_kampus = Session::get('id_kampus');
-        $kampusProdi->kode_prodi = $request->kode_prodi;
-        $kampusProdi->nama = $request->nama;
-        $kampusProdi->jenjang = $request->jenjang;
-        $kampusProdi->masa_studi = $request->masa_studi;
+        $mou->no_mou = $request->no_mou;
+        $mou->id_kampus = $kampus->id;
+        $mou->max_reschedule = $request->max_reschedule;
+        $mou->status_gelombang = $request->status_gelombang ?? 0;
+        $mou->tanggal_dibuat = now()->format('Y-m-d');
 
-        if (!$kampusProdi->getDirty()) {
+        if (!$mou->getDirty()) {
             return redirect()
-                ->route('kampus.prodi.index')
+                ->route('detail-kampus.mou.index', [
+                    'kampus' => $kampus->id
+                ])
                 ->with('flash_message', (object)[
                     'type' => 'warning',
                     'title' => 'Peringatan',
@@ -181,9 +175,12 @@ class KampusProdiController extends Controller
                 ]);
         }
 
-        $kampusProdi->save();
+        $mou->save();
 
-        return redirect(route('kampus.prodi.index'))
+        return redirect()
+            ->route('detail-kampus.mou.index', [
+                'kampus' => $kampus->id
+            ])
             ->with('flash_message', (object)[
                 'type' => 'success',
                 'title' => 'Sukses',
@@ -194,13 +191,16 @@ class KampusProdiController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\KampusProdi  $kampusProdi
+     * @param  \App\KampusMou  $mou
      * @return \Illuminate\Http\Response
      */
-    public function destroy(KampusProdi $kampusProdi)
+    public function destroy(MasterKampus $kampus, KampusMou $mou)
     {
-        if (!$kampusProdi->delete()) {
-            return redirect(route('kampus.prodi.index'))
+        if (!$mou->delete()) {
+            return redirect()
+                ->route('detail-kampus.mou.index', [
+                    'kampus' => $kampus->id
+                ])
                 ->with('flash_message', (object)[
                     'type' => 'danger',
                     'title' => 'Terjadi Kesalahan',
@@ -208,7 +208,10 @@ class KampusProdiController extends Controller
                 ]);
         }
 
-        return redirect(route('kampus.prodi.index'))
+        return redirect()
+            ->route('detail-kampus.mou.index', [
+                'kampus' => $kampus->id
+            ])
             ->with('flash_message', (object)[
                 'type' => 'success',
                 'title' => 'Sukses',

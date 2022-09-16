@@ -28,7 +28,7 @@
                         <td>{{ $masterKampus->tahun_kerjasama }}</td>
                         <td>
                             <div class="d-flex gap-2">
-                                <!-- <a href="{{ route('master.kampus.edit', ['master_kampus' => $masterKampus->id]) }}" class="btn btn-primary btn-sm">detail</a> -->
+                                <a href="{{ route('detail-kampus.dashboard', ['kampus' => $masterKampus->id]) }}" class="btn btn-primary btn-sm">Detail</a>
                                 <a href="{{ route('master.kampus.edit', ['master_kampus' => $masterKampus->id]) }}" class="btn btn-warning btn-sm">Edit</a>
                                 <form action="{{ route('master.kampus.destroy', ['master_kampus' => $masterKampus->id]) }}" method="post">
                                     @csrf

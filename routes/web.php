@@ -4,6 +4,7 @@ use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,18 +26,18 @@ Auth::routes(['verify' => false]);
 Route::middleware(['auth'])->group(function () {
     Route::get('/home', 'HomeController@index')->name('home');
 
-    Route::prefix('kampus')->name('kampus.')->group(function () {        
+    Route::prefix('kampus')->name('kampus.')->group(function () {
         Route::resource('mou', 'KampusMouController')->parameter('mou', 'kampus_mou');
         Route::resource('prodi', 'KampusProdiController')->parameter('prodi', 'kampus_prodi');
         Route::resource('item-bayar', 'KampusItemBayarController')->parameter('item-bayar', 'kampus_item_bayar'); //revisi
-        Route::resource('gelombang', 'KampusGelombangController')->parameter('gelombang', 'kampus_gelombang'); 
+        Route::resource('gelombang', 'KampusGelombangController')->parameter('gelombang', 'kampus_gelombang');
         Route::resource('pembayaran', 'KampusPembayaranController')->parameter('pambayaran', 'kampus_pembayaran');
         Route::resource('mahasiswa', 'KampusMahasiswaController')->parameter('mahasiswa', 'kampus_mahasiswa');
-        Route::get('switch/{id_kampus}/{to}',function($id_kampus,$to){
-            foreach(Auth::user()->load('user_kampus')->user_kampus as $kampus){
-                if($kampus->id_kampus==$id_kampus){
-                    Session::put('id_kampus',$kampus->kampus->id);
-                    Session::put('nama_kampus',$kampus->kampus->nama_kampus);
+        Route::get('switch/{id_kampus}/{to}', function ($id_kampus, $to) {
+            foreach (Auth::user()->load('user_kampus')->user_kampus as $kampus) {
+                if ($kampus->id_kampus == $id_kampus) {
+                    Session::put('id_kampus', $kampus->kampus->id);
+                    Session::put('nama_kampus', $kampus->kampus->nama_kampus);
                     return redirect(route(base64_decode($to)));
                 }
             }
@@ -50,10 +51,20 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('kampus', 'MasterKampusController')->except('view')->parameter('kampus', 'master_kampus');
         Route::resource('tipe-biaya-potongan', 'MasterTipeBiayaPotonganController')->except('view')->parameter('tipe-biaya-potongan', 'master_tipe_biaya_potongan');
     });
+
+    Route::prefix('detail-kampus/{kampus}')->name('detail-kampus.')->group(function () {
+        Route::get('/', 'DetailKampusController@index')->name('dashboard');
+        Route::resource('mou', 'AdminKampusMouController')->except('view');
+        Route::resource('prodi', 'KampusProdiController')->except('view');
+        Route::resource('item-bayar', 'KampusItemBayarController')->except('view');
+        Route::resource('gelombang', 'KampusGelombangController')->except('view');
+        Route::resource('pembayaran', 'KampusPembayaranController')->except('view');
+        Route::resource('mahasiswa', 'KampusMahasiswaController')->except('view');
+    });
 });
 
 Route::prefix('jadwal_ulang')->group(function () {
-    Route::get('/', 'KampusJadwalUlangTagihan@index'); //untuk mahasiswa 
+    Route::get('/', 'KampusJadwalUlangTagihan@index'); //untuk mahasiswa
     Route::post('/', 'KampusJadwalUlangTagihan@create');  //untuk mahasiswa
     Route::post('/{id}', 'KampusJadwalUlangTagihan@update'); //untuk kampus/admin
     Route::get('/{id}', 'KampusJadwalUlangTagihan@delete'); //untuk mahasiswa
@@ -84,7 +95,7 @@ Route::prefix('jadwal_ulang')->group(function () {
 //                     ->join('master_kampus as mk','kp.id_kampus','=','mk.id')
 //                     ->where('krm.tanggal_bayar',date('Y-m-d')) //date('Y-m-d')
 //                     ->get();
-        
+
 //         dd($data_group_mahasiwa,$data_mahasiwa);
 //         DB::transaction(function () use (&$data_group_mahasiwa,&$data_mahasiwa) {
 //             foreach($data_group_mahasiwa as $dgm){
