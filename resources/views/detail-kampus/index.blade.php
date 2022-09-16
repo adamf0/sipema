@@ -97,7 +97,7 @@
                     <div class="col-12">
                         <div class="card bg-white border shadow">
                             <div class="card-block">
-                                <h6 class="m-b-20 fw-semibold">Penagihan</h6>
+                                <h6 class="m-b-20 fw-semibold">Grafik Penagihan</h6>
                                 <hr>
                                 <canvas id="chart"></canvas>
                             </div>

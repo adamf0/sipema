@@ -130,28 +130,28 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('detail-kampus.gelombang.index', ['kampus' => $kampus->id]) }}" class="nav-link {{ request()->routeIs('detail-kampus.gelombang.*') ? 'active' : 'link-dark' }}">
-                        Gelombang
+                    <a href="#" class="nav-link {{ request()->routeIs('detail-kampus.gelombang.*') ? 'active' : 'link-dark' }}">
+                        [WIP] Gelombang
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('detail-kampus.item-bayar.index', ['kampus' => $kampus->id]) }}" class="nav-link {{ request()->routeIs('detail-kampus.item-bayar.*') ? 'active' : 'link-dark' }}">
-                        Item Bayar
+                    <a href="#" class="nav-link {{ request()->routeIs('detail-kampus.item-bayar.*') ? 'active' : 'link-dark' }}">
+                        [WIP] Item Bayar
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('detail-kampus.mahasiswa.index', ['kampus' => $kampus->id]) }}" class="nav-link {{ request()->routeIs('detail-kampus.mahasiswa.*') ? 'active' : 'link-dark' }}">
-                        Mahasiswa
+                    <a href="#" class="nav-link {{ request()->routeIs('detail-kampus.mahasiswa.*') ? 'active' : 'link-dark' }}">
+                        [WIP] Mahasiswa
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('detail-kampus.pembayaran.index', ['kampus' => $kampus->id]) }}" class="nav-link {{ request()->routeIs('detail-kampus.pembayaran.*') ? 'active' : 'link-dark' }}">
-                        Metode Pembayaran
+                    <a href="#" class="nav-link {{ request()->routeIs('detail-kampus.pembayaran.*') ? 'active' : 'link-dark' }}">
+                        [WIP] Metode Pembayaran
                     </a>
                 </li>
                 <li>
                     <a href="#" class="nav-link link-dark">
-                        Jadwal Ulang Tagihan
+                        [WIP] Jadwal Ulang Tagihan
                     </a>
                 </li>
             </ul>
