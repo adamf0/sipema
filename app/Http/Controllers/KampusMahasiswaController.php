@@ -6,13 +6,13 @@ use App\KampusItemBayar;
 use App\KampusMahasiswa;
 use App\KampusMou;
 use App\KampusProdi;
-use App\KampusRencanaMahasiswa;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Session;
 
 class KampusMahasiswaController extends Controller
 {
@@ -31,7 +31,7 @@ class KampusMahasiswaController extends Controller
         $user = Auth::user();
         // $user->load('user_kampus');
 
-        $mahasiswas = KampusMahasiswa::whereHas('prodi',function($query) use(&$user){
+        $mahasiswas = KampusMahasiswa::whereHas('prodi', function ($query) use (&$user) {
             $query->whereKampus(Session::get('id_kampus'));
         })->simplePaginate(5);
 
@@ -48,13 +48,13 @@ class KampusMahasiswaController extends Controller
         $prodis = KampusProdi::all(['id', 'kode_prodi', 'nama']);
         $user = Auth::user();
         $user->load('user_kampus');
-        
+
         $itemBayars = KampusItemBayar::with(['gelombang', 'item'])
             ->whereKampus(Session::get('id_kampus'))
             ->where('status', 1)
             ->get()
             ->filter(function ($item) {
-                if (\Carbon\Carbon::parse(date('Y-m-d'))->between($item->gelombang->tanggal_mulai, $item->gelombang->tanggal_akhir)) {
+                if (Carbon::parse(date('Y-m-d'))->between($item->gelombang->tanggal_mulai, $item->gelombang->tanggal_akhir)) {
                     return $item;
                 }
             })
@@ -88,7 +88,7 @@ class KampusMahasiswaController extends Controller
                 'item_bayar_selected',
             ]),
             [
-                'nim' => ['nullable', 'numeric', 'digits_between:9,10'],
+                'nim' => ['nullable', 'numeric'],
                 'nama_lengkap' => ['required'],
                 'tanggal_lahir' => ['required', 'date'],
                 'jenis_kelamin' => ['required', 'integer', Rule::in([1, 2])],
@@ -104,7 +104,7 @@ class KampusMahasiswaController extends Controller
                 'jenis_kelamin' => 'Jenis Kelamin',
                 'prodi' => 'Prodi',
                 'tanggal_pembayaran' => 'Tanggal Pembayaran',
-                'item_bayar_selected.*' => 'Item Bayar' 
+                'item_bayar_selected.*' => 'Item Bayar'
             ]
         );
 
@@ -216,9 +216,9 @@ class KampusMahasiswaController extends Controller
      */
     public function edit(KampusMahasiswa $kampusMahasiswa)
     {
-        $kampusMahasiswa->item_bayar_selected = array_map('intval',json_decode($kampusMahasiswa->item_bayar_selected));
+        $kampusMahasiswa->item_bayar_selected = array_map('intval', json_decode($kampusMahasiswa->item_bayar_selected));
         $prodis = KampusProdi::all(['id', 'kode_prodi', 'nama']);
-        
+
         $user = Auth::user();
         $user->load('user_kampus');
 
@@ -281,7 +281,7 @@ class KampusMahasiswaController extends Controller
                 'jenis_kelamin' => 'Jenis Kelamin',
                 'prodi' => 'Prodi',
                 'tanggal_pembayaran' => 'Tanggal Pembayaran',
-                'item_bayar_selected.*' => 'Item Bayar' 
+                'item_bayar_selected.*' => 'Item Bayar'
             ]
         );
 
