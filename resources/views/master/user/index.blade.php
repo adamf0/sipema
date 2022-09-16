@@ -15,7 +15,7 @@
                     <th>Email</th>
                     <th>Hak Akses</th>
                     <th>Management Kampus</th>
-                    <th>Email</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
