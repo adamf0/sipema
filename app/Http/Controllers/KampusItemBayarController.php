@@ -4,21 +4,18 @@ namespace App\Http\Controllers;
 
 use App\KampusGelombang;
 use App\KampusItemBayar;
+use App\KampusProdi;
 use App\MasterItem;
-use App\Rules\AnggaranNotEmpty;
-use App\Rules\AnggaranValid;
+use App\MasterKelompok;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use Session;
 
 class KampusItemBayarController extends Controller
 {
-    public $id_kampus = null;
     public function __construct()
     {
-        // Session::get('id_kampus') = auth()->user()->id_kampus;
+
     }
     /**
      * Display a listing of the resource.
@@ -27,11 +24,8 @@ class KampusItemBayarController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
-        // $user->load('user_kampus');
-        
         $kampusItemBayars = KampusItemBayar::whereKampus(Session::get('id_kampus'))
-                            ->with(['item','gelombang'])
+                            ->with(['item','gelombang','kelompok','prodi','prodi.kampus'])
                             ->orderBy('tahun_akademik','ASC')
                             ->orderBy('id_item','ASC')
                             ->orderBy('id_data_gelombang','ASC')
@@ -52,8 +46,10 @@ class KampusItemBayarController extends Controller
     public function create()
     {
         $items = MasterItem::all();
+        $kelompoks = MasterKelompok::all();
+        $prodis = KampusProdi::whereKampus(Session::get('id_kampus'))->get();
         $gelombangs = KampusGelombang::whereKampus(Session::get('id_kampus'))->get();
-        return view('kampus.item_bayar.create',["items"=>$items,'gelombangs'=>$gelombangs]);
+        return view('kampus.item_bayar.create',["items"=>$items,'gelombangs'=>$gelombangs,'prodis'=>$prodis,'kelompoks'=>$kelompoks]);
     }
 
     /**
@@ -64,99 +60,78 @@ class KampusItemBayarController extends Controller
      */
     public function store(Request $request)
     {   
-        // $input = [
-        //     // 'tahun_akademik',
-        //     // 'id_gelombang',
-        //     // 'id_item',
-        //     'total_angsuran.*',
-        // ];
-        // $rule = [
-        //     // 'tahun_akademik' => ['required'],
-        //     // 'id_gelombang' => ['required'],
-        //     // 'id_item' => ['required'],
-        //     'total_angsuran.*' => ['required'],
-        // ];
-        // $output = [
-        //     // 'tahun_akademik' => 'Nama Beasiswa',
-        //     // 'id_gelombang' => 'Persentase Potongan',
-        //     // 'id_item' => 'Item',
-        //     'total_angsuran.*' => 'Angsuran',
-        // ];
-        // foreach($request->total_angsuran as $angsuran){
-        //     for($i=0;$i<$angsuran;$i++){
-        //         array_push($input,"anggaran[$angsuran][$i]");
-        //         $rule["anggaran.$angsuran"] = function ($attribute, $value, $fail) {
-        //             if (array_sum($value)!=1500000) {
-        //                 $e = explode('.',$attribute);
-        //                 $fail("Total nominal pada angsuran ke-$e[1] tidak mencapai 1500000");
-        //             }
-        //         };
-        //         $rule["anggaran.$angsuran.$i"] = ["required"];
-        //         $output["anggaran.$angsuran.$i"] = "Angsuran ke-$angsuran cicilan ke-".($i+1);
-        //     }
-        // }
-
-        // $validator = Validator::make(
-        //     $request->only($input),
-        //     $rule,
-        //     [],
-        //     $output
-        // );
-
-        // if ($validator->fails()) {
-        //     return redirect()
-        //         ->back()
-        //         ->with('flash_message', (object)[
-        //             'type' => 'danger',
-        //             'title' => 'Terjadi Kesalahan',
-        //             'message' => 'Silahkan cek kembali Form'
-        //         ])
-        //         ->withErrors($validator)
-        //         ->withInput();
-        // }
-        // dd(
-        //     $request->total_angsuran,
-        //     $request->anggaran,
-        //     $validator->getMessageBag(),
-        //     $validator->fails()
-        // );
-        
         DB::transaction(function () use (&$request) {
-            $anggaran = [];            
+            $anggaran = [];
+            $anggaran_custom = [];          
             foreach($request->total_angsuran as $angsuran){
                 $_anggaran = [];
-                collect($request->anggaran[$angsuran])->each(function($a,$index) use(&$_anggaran){
-                    $nominal = str_replace("Rp ","",$a);
-                    $nominal = str_replace(".","",$nominal);
-                    $nominal = str_replace(",00","",$nominal);
-        
-                    array_push($_anggaran,[
-                        "nama"=> "cicilan ke ".($index+1),
-                        "nominal"=>(int) $nominal 
+                if($angsuran!=null || $angsuran!="" || $angsuran!=0){
+                    $nominal = $request->nominal / $angsuran;
+                    for ($i=0; $i < $angsuran; $i++) { 
+                        array_push($_anggaran,[
+                            "nama"=> (int) $i+1,
+                            "nominal"=>(int) $nominal 
+                        ]);
+                    }
+                    array_push($anggaran,[
+                        "angsuran"=>(int) $angsuran,
+                        "type"=>1,
+                        "data"=>$_anggaran
                     ]);
-                });
-                array_push($anggaran,[
-                    "angsuran"=>(int) $angsuran,
-                    "data"=>$_anggaran
-                ]);
-                
-                $kampusItemBayar = new KampusItemBayar();
-                $kampusItemBayar->id_kampus = Session::get('id_kampus');
-                $kampusItemBayar->id_item = $request->id_item;
-                $kampusItemBayar->id_data_gelombang = $request->id_gelombang;
-                $kampusItemBayar->tahun_akademik = $request->tahun_akademik;
-                $kampusItemBayar->jumlah_angsuran = $angsuran;
-                $kampusItemBayar->status = 1;
-                $kampusItemBayar->template_angsuran = json_encode($_anggaran);
-                $kampusItemBayar->save();
+                }
             }
-            $template = [
-                "id_item"=>(int) $request->id_item,
-                "id_gelombang"=>(int) $request->id_gelombang,
-                "template"=>$anggaran
-            ];
-            
-            DB::table("kampus_template_item_bayar")->insert(["id_kampus"=>Session::get('id_kampus'),"template_item_bayar"=>json_encode($template)]);
+
+            foreach($request->angsuranC as $index => $angsuran){
+                $_anggaran = [];
+
+                if($angsuran!=null || $angsuran!="" || $angsuran!=0){
+                    $max = count($request->nominalC[$index]);
+                    for ($i=0; $i < $max; $i++) { 
+                        array_push($_anggaran,[
+                            "nama"=> (int) $request->cicilanC[$index][$i], 
+                            "nominal"=>(int) $request->nominalC[$index][$i] 
+                        ]);
+                    }
+
+                    $nominal_custom = ($request->nominal - array_sum($request->nominalC[$index]))/($angsuran-count($request->nominalC[$index]));
+                    for ($i=1; $i <= $angsuran; $i++) { 
+                        if(!in_array($i,$request->cicilanC[$index])){
+                            array_push($_anggaran,[
+                                "nama"=> (int) $i,
+                                "nominal"=>(int) $nominal_custom
+                            ]);
+                        }
+                    }
+                                
+                    array_push($anggaran_custom,[
+                        "angsuran"=>(int) $angsuran,
+                        "type"=>0,
+                        "data"=>$_anggaran
+                    ]);
+                }
+            }
+            $anggaran_custom = collect($anggaran_custom)->map(function($items,$index){
+                $items['data'] = collect($items['data'])->sortBy('nama')->values()->toArray();
+                return $items;
+            })->values()->toArray();
+
+            $anggaran = collect(array_merge($anggaran,$anggaran_custom))->sortBy('angsuran')->values();
+
+            $anggaran->each(function($items,$index) use(&$request){
+                $kampusItemBayar                    = new KampusItemBayar();
+                $kampusItemBayar->id_kampus         = Session::get('id_kampus');
+                $kampusItemBayar->id_item           = $request->id_item;
+                $kampusItemBayar->id_data_gelombang = $request->id_gelombang;
+                $kampusItemBayar->id_prodi          = $request->id_prodi;
+                $kampusItemBayar->id_kelompok       = $request->id_kelompok;
+                $kampusItemBayar->nominal           = $request->nominal;
+                $kampusItemBayar->tahun_akademik    = $request->tahun_akademik;
+                $kampusItemBayar->jumlah_angsuran   = $items['angsuran'];
+                $kampusItemBayar->type              = $items['type'];
+                $kampusItemBayar->status            = 1;
+                $kampusItemBayar->template_angsuran = json_encode($items['data']);
+                $kampusItemBayar->save();
+            });
         });
 
         return redirect(route('kampus.item-bayar.index'))
@@ -187,11 +162,13 @@ class KampusItemBayarController extends Controller
     public function edit(KampusItemBayar $kampusItemBayar)
     {
         $items = MasterItem::all();
+        $kelompoks = MasterKelompok::all();
+        $prodis = KampusProdi::whereKampus(Session::get('id_kampus'))->get();
         $gelombangs = KampusGelombang::whereKampus(Session::get('id_kampus'))->get();
         $kampusItemBayar->with('item');
         $kampusItemBayar->template_angsuran = json_decode($kampusItemBayar->template_angsuran);
 
-        return view('kampus.item_bayar.edit',["items"=>$items,'gelombangs'=>$gelombangs,'item_bayar'=>$kampusItemBayar]);
+        return view('kampus.item_bayar.edit',["items"=>$items,'gelombangs'=>$gelombangs,'item_bayar'=>$kampusItemBayar,'prodis'=>$prodis,'kelompoks'=>$kelompoks]);
     }
 
     /**
@@ -203,49 +180,60 @@ class KampusItemBayarController extends Controller
      */
     public function update(Request $request, KampusItemBayar $kampusItemBayar)
     {
-        DB::transaction(function () use (&$request,&$kampusItemBayar) {
-            $_anggaran = [];
-            collect($request->anggaran)->each(function($a,$index) use(&$_anggaran){
-                $nominal = str_replace("Rp ","",$a);
-                $nominal = str_replace(".","",$nominal);
-                $nominal = str_replace(",00","",$nominal);
-    
-                array_push($_anggaran,[
-                    "nama"=> "cicilan ke ".($index+1),
-                    "nominal"=>(int) $nominal 
-                ]);
-            });
-
-            $kampusItemBayar->id_kampus = Session::get('id_kampus');
-            $kampusItemBayar->id_item = $request->id_item;
-            $kampusItemBayar->id_data_gelombang = $request->id_gelombang;
-            $kampusItemBayar->tahun_akademik = $request->tahun_akademik;
-            $kampusItemBayar->template_angsuran = json_encode($_anggaran);
-            
-            $templateItemBayar = DB::table('kampus_template_item_bayar')
-                                    ->where('template_item_bayar','like','%"id_item":'.$request->id_item.',"id_gelombang":'.$request->id_gelombang.'%')
-                                    ->first();
-            $templateItemBayar = collect(json_decode($templateItemBayar->template_item_bayar));
-            collect($templateItemBayar['template'])->each(function($template,$index) use(&$kampusItemBayar,&$_anggaran){
-                if(count($template->data)==$kampusItemBayar->jumlah_angsuran){
-                    $template->data = $_anggaran;
+        try {
+            DB::transaction(function () use (&$request,&$kampusItemBayar) {
+                $_anggaran = [];
+                if(!$request->has('key')){
+                    $nominal = $request->nominal / $request->total_angsuran;
+                    for ($i=0; $i < $request->total_angsuran; $i++) { 
+                        array_push($_anggaran,[
+                            "nama"=> "cicilan ke ".($i+1),
+                            "nominal"=>(int) $nominal 
+                        ]);
+                    }
                 }
-            });
-            
-            $kampusItemBayar->save();
-            DB::table('kampus_template_item_bayar')
-                ->where('template_item_bayar','like','%"id_item":'.$request->id_item.',"id_gelombang":'.$request->id_gelombang.'%')
-                ->update([
-                    "template_item_bayar"=>json_encode($templateItemBayar->toArray())
-                ]);
-        });
+                else{
+                    if($request->total_angsuran != count($request->key)){
+                        throw new \Exception("Total angsuran tidak sama dengan total input cicilan");
+                    }
+                    if($request->nominal != array_sum($request->angsuran)){
+                        throw new \Exception("Nominal tidak sama dengan total nilai cicilan");
+                    }
 
-        return redirect(route('kampus.item-bayar.index'))
-            ->with('flash_message', (object)[
-                'type' => 'success',
-                'title' => 'Sukses',
-                'message' => 'Berhasil Mengubah Data'
-            ]);
+                    for ($i=0; $i < count($request->key); $i++) { 
+                        array_push($_anggaran,[
+                            "nama"=> $request->key[$i],
+                            "nominal"=>(int) $request->angsuran[$i] 
+                        ]);
+                    }
+                }
+
+                $kampusItemBayar->id_kampus         = Session::get('id_kampus');
+                $kampusItemBayar->id_item           = $request->id_item;
+                $kampusItemBayar->id_data_gelombang = $request->id_gelombang;
+                $kampusItemBayar->id_prodi          = $request->id_prodi;
+                $kampusItemBayar->id_kelompok       = $request->id_kelompok;
+                $kampusItemBayar->nominal           = $request->nominal;
+                $kampusItemBayar->jumlah_angsuran   = $request->total_angsuran;
+                $kampusItemBayar->tahun_akademik    = $request->tahun_akademik;
+                $kampusItemBayar->template_angsuran = json_encode($_anggaran);
+                $kampusItemBayar->save();
+            });
+
+            return redirect(route('kampus.item-bayar.index'))
+                    ->with('flash_message', (object)[
+                        'type' => 'success',
+                        'title' => 'Sukses',
+                        'message' => 'Berhasil Mengubah Data'
+                    ]);
+        } catch (\Exception $e) {
+            return redirect(route('kampus.item-bayar.index'))
+                        ->with('flash_message', (object)[
+                            'type' => 'danger',
+                            'title' => 'Terjadi Kesalahan',
+                            'message' => $e->getMessage()
+                        ]);
+        }
     }
 
     /**

@@ -173,6 +173,11 @@
                         </a>
                     </li>
                     <li>
+                        <a href="{{ route('master.kelompok.index') }}" class="nav-link {{ request()->routeIs('master.kelompok.*') ? 'active' : 'link-dark' }}">
+                            Master Kelompok
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{ route('master.kampus.index') }}" class="nav-link {{ request()->routeIs('master.kampus.*') ? 'active' : 'link-dark' }}">
                             Master Kampus
                         </a>
