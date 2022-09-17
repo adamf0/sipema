@@ -67,7 +67,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('item-bayar', 'KampusItemBayarController')->except('view');
         Route::resource('gelombang', 'KampusGelombangController')->except('view');
         Route::resource('pembayaran', 'KampusPembayaranController')->except('view');
-        Route::resource('mahasiswa', 'KampusMahasiswaController')->except('view');
+        Route::resource('mahasiswa', 'AdminKampusMahasiswaController')->except('view');
     });
 });
 // Route::get('add-role/{id}/{role}', function($id,$role){
