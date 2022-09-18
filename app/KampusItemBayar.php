@@ -40,4 +40,8 @@ class KampusItemBayar extends Model
     {
         return $this->hasOne(MasterKelompok::class,'id','id_kelompok');
     }
+    public function rencana()
+    {
+        return $this->belongsTo(KampusRencanaMahasiswa::class, 'id_item_bayar', 'id');
+    }
 }

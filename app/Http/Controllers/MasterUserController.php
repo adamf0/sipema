@@ -53,14 +53,14 @@ class MasterUserController extends Controller
                 'email',
                 'password',
                 'role',
-                'kampus'
+                // 'kampus'
             ]),
             [
                 'nama' => ['required'],
                 'email' => ['required','email'],
                 'password' => ['required'],
                 'role' => ['required'],
-                'kampus' => ['required'],
+                // 'kampus' => ['required'],
             ],
             [],
             [
@@ -68,7 +68,7 @@ class MasterUserController extends Controller
                 'email' => 'Email',
                 'password' => 'Password',
                 'role' => 'Level',
-                'kampus' => 'Kampus',
+                // 'kampus' => 'Kampus',
             ]
         );
 
@@ -92,11 +92,13 @@ class MasterUserController extends Controller
             $user->save();
             $user->assignRole($request->role);
 
-            foreach($request->kampus as $id_kampus){
-                $userKampus = new UserKampus();
-                $userKampus->id_user = $user->id;
-                $userKampus->id_kampus = $id_kampus;
-                $userKampus->save();
+            if($request->role!="Admin"){
+                foreach($request->kampus as $id_kampus){
+                    $userKampus = new UserKampus();
+                    $userKampus->id_user = $user->id;
+                    $userKampus->id_kampus = $id_kampus;
+                    $userKampus->save();
+                }
             }
         });
 
@@ -152,20 +154,20 @@ class MasterUserController extends Controller
                 'nama',
                 'email',
                 'role',
-                'kampus'
+                // 'kampus'
             ]),
             [
                 'nama' => ['required'],
                 'email' => ['required','email'],
                 'role' => ['required'],
-                'kampus' => ['required'],
+                // 'kampus' => ['required'],
             ],
             [],
             [
                 'nama' => 'Nama',
                 'email' => 'Email',
-                'role' => 'Password',
-                'kampus' => 'Kampus',
+                'role' => 'Role',
+                // 'kampus' => 'Kampus',
             ]
         );
 
@@ -199,14 +201,19 @@ class MasterUserController extends Controller
                 $user->user_kampus->pluck('id_kampus')->toArray()
             );
             
-            if(count($diff)>0 || count($diff2)>0){
+            if(count($diff)>0 || count($diff2)>0 && $request->role!="Admin"){
                 UserKampus::where('id_user',$user->id)->delete();
-                foreach($request->kampus as $id_kampus){
-                    $userKampus = new UserKampus();
-                    $userKampus->id_user = $user->id;
-                    $userKampus->id_kampus = $id_kampus;
-                    $userKampus->save();
-                }
+                
+                    foreach($request->kampus as $id_kampus){
+                        $userKampus = new UserKampus();
+                        $userKampus->id_user = $user->id;
+                        $userKampus->id_kampus = $id_kampus;
+                        $userKampus->save();
+                    }
+                
+            }
+            else{
+                UserKampus::where('id_user',$user->id)->delete();
             }
         });
 

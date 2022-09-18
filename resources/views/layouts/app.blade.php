@@ -245,7 +245,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="nav-link link-dark">
+                        <a href="{{ route('kampus.jadwal_ulang.index') }}" class="nav-link {{ request()->routeIs('kampus.jadwal_ulang.*') ? 'active' : 'link-dark' }}">
                             Jadwal Ulang Tagihan
                         </a>
                     </li>

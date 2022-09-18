@@ -83,9 +83,9 @@ class DetailKampusController extends Controller
             "prodi" => KampusProdi::whereKampus($kampus->id)->get(),
             "gelombang" => KampusGelombang::whereKampus($kampus->id)->get(),
             "item_bayar" => KampusItemBayar::whereKampus($kampus->id)->get(),
-            "mahasiswa" => KampusMahasiswa::with(['prodi' => function ($query) use ($kampus) {
+            "mahasiswa" => KampusMahasiswa::whereHas('prodi', function ($query) use ($kampus) {
                 $query->whereKampus($kampus->id);
-            }])->get(),
+            })->get(),
             "tagihan" => (object) [
                 "menunggu" => $menunggu,
                 "selesai" => $selesai,

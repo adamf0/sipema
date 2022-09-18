@@ -46,7 +46,7 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-                <div class="mb-3">
+                <div class="mb-3 panel-kampus">
                     <label for="kampus" class="form-label">Kampus</label>
                     <select name="kampus[]" id="kampus" class="form-select @error('kampus') is-invalid @enderror" multiple>
                         @foreach ($kampuss as $kampus)
@@ -72,9 +72,20 @@
     <script>
         // In your Javascript (external .js resource or <script> tag)
         $(document).ready(function() {
+            $('.panel-kampus').hide();
+
             $('#kampus').select2({
                 theme: 'bootstrap-5',
                 placeholder: "Pilih Kampus"
+            });
+
+            $('#role').change(function(){
+                if($(this).val()=="Admin"){
+                    $('.panel-kampus').hide();
+                }
+                else{
+                    $('.panel-kampus').show();
+                }
             });
 
             $("#kampus + span").addClass("w-100");
