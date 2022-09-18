@@ -10,10 +10,9 @@ use Illuminate\Support\Facades\Validator;
 
 class KampusProdiController extends Controller
 {
-    public $id_kampus = null;
     public function __construct()
     {
-        // $this->id_kampus = Session::get('id_kampus');
+
     }
     /**
      * Display a listing of the resource.
@@ -22,9 +21,6 @@ class KampusProdiController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
-        // $user->load('user_kampus');
-
         $prodis = KampusProdi::whereKampus(Session::get('id_kampus'))->simplePaginate(5);
 
         return view('kampus.prodi.index', ['prodis' => $prodis]);

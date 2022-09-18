@@ -40,8 +40,18 @@ class KampusMahasiswa extends Model
         return $this->hasOne(KampusMou::class, 'id', 'id_mou');
     }
 
+    public function jadwal_ulang()
+    {
+        return $this->hasOne(KampusJadwalUlang::class, 'id_mahasiswa', 'id');
+    }
+
     public function tagihan()
     {
         return $this->belongsTo(KampusTagihan::class, 'id_mahasiswa','id');
+    }
+
+    public function rencana()
+    {
+        return $this->belongsTo(KampusRencanaMahasiswa::class, 'id_mahasiswa','id');
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+use App\KampusTagihan;
+use App\KampusTagihanDetail;
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -33,6 +35,15 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('gelombang', 'KampusGelombangController')->parameter('gelombang', 'kampus_gelombang');
         Route::resource('pembayaran', 'KampusPembayaranController')->parameter('pambayaran', 'kampus_pembayaran');
         Route::resource('mahasiswa', 'KampusMahasiswaController')->parameter('mahasiswa', 'kampus_mahasiswa');
+        Route::resource('jadwal_ulang', 'KampusJadwalUlangTagihan')->parameter('mahasiswa', 'kampus_mahasiswa');
+        // Route::prefix('jadwal_ulang')->name('jadwal_ulang.')->group(function () {
+        //     Route::get('/', 'KampusJadwalUlangTagihan@index')->name('index'); 
+        //     Route::get('/create', 'KampusJadwalUlangTagihan@create')->name('create'); 
+        //     Route::get('/edit/{id}', 'KampusJadwalUlangTagihan@edit')->name('edit');            
+        //     Route::post('/store', 'KampusJadwalUlangTagihan@store')->name('store');  
+        //     Route::post('/update/{id}', 'KampusJadwalUlangTagihan@update')->name('update'); 
+        //     Route::get('/{id}', 'KampusJadwalUlangTagihan@delete')->name('destroy'); 
+        // });
         Route::get('switch/{id_kampus}/{to}', function ($id_kampus, $to) {
             foreach (Auth::user()->load('user_kampus')->user_kampus as $kampus) {
                 if ($kampus->id_kampus == $id_kampus) {
@@ -43,14 +54,9 @@ Route::middleware(['auth'])->group(function () {
             }
         })->name('switch');
     });
-    Route::resource('biaya-potongan', 'BiayaPotonganController')->parameter('biaya_potong', 'biaya_potongan');
-    Route::prefix('jadwal_ulang')->group(function () {
-        Route::get('/', 'KampusJadwalUlangTagihan@index'); //untuk mahasiswa
-        Route::post('/', 'KampusJadwalUlangTagihan@create');  //untuk mahasiswa
-        Route::post('/{id}', 'KampusJadwalUlangTagihan@update'); //untuk kampus/admin
-        Route::get('/{id}', 'KampusJadwalUlangTagihan@delete'); //untuk mahasiswa
-    });
 
+    Route::resource('biaya-potongan', 'BiayaPotonganController')->parameter('biaya_potong', 'biaya_potongan');
+    
     Route::prefix('master')->name('master.')->group(function () {
         Route::resource('user', 'MasterUserController')->except('view')->parameter('user', 'user');
         Route::resource('item', 'MasterItemController')->except('view')->parameter('item', 'master_item');
@@ -74,43 +80,49 @@ Route::middleware(['auth'])->group(function () {
 //     $user = User::findOrFail($id);
 //     $user->assignRole($role);
 // });
-// Route::get('tes-transaksi', function(){
-//         $data_group_mahasiwa = DB::table('kampus_rencana_mahasiswa as krm')
-//                             ->select(
-//                                 DB::raw('concat(mk.kode_kampus,"'.rand(0,100).'",IF(km.nim!="", km.nim, km.nim_sementara)) as nomor_transaksi'),
-//                                 'krm.id_mahasiswa',
-//                                 'krm.tanggal_bayar as tanggal',
-//                                 DB::raw('concat("0") as status'),
-//                                 'krm.id_mahasiswa'
-//                             )
-//                             ->join('kampus_mahasiswa as km','krm.id_mahasiswa','=','km.id')
-//                             ->join('kampus_prodi as kp','km.id_prodi','=','kp.id')
-//                             ->join('master_kampus as mk','kp.id_kampus','=','mk.id')
-//                             ->where('krm.tanggal_bayar',date('Y-m-d')) //date('Y-m-d')
-//                             ->groupBy('krm.id_mahasiswa')
-//                             ->get();
-//         $data_mahasiwa = DB::table('kampus_rencana_mahasiswa as krm')
-//                     ->select('krm.id as id_tagihan_mahasiswa','krm.biaya')
-//                     ->join('kampus_mahasiswa as km','krm.id_mahasiswa','=','km.id')
-//                     ->join('kampus_prodi as kp','km.id_prodi','=','kp.id')
-//                     ->join('master_kampus as mk','kp.id_kampus','=','mk.id')
-//                     ->where('krm.tanggal_bayar',date('Y-m-d')) //date('Y-m-d')
-//                     ->get();
+Route::get('tes-transaksi', function(){
+        $data_group_mahasiwa = DB::table('kampus_rencana_mahasiswa as krm')
+                            ->select(
+                                DB::raw('concat(mk.kode_kampus,"'.rand(0,100).'",IF(km.nim!="", km.nim, km.nim_sementara)) as nomor_transaksi'),
+                                'krm.id_mahasiswa',
+                                'krm.tanggal_bayar as tanggal',
+                                DB::raw('concat("0") as status'),
+                                'krm.id_mahasiswa'
+                            )
+                            ->join('kampus_mahasiswa as km','krm.id_mahasiswa','=','km.id')
+                            ->join('kampus_prodi as kp','km.id_prodi','=','kp.id')
+                            ->join('master_kampus as mk','kp.id_kampus','=','mk.id')
+                            ->where('krm.tanggal_bayar',date('Y-m-d')) //date('Y-m-d')
+                            ->groupBy('krm.id_mahasiswa')
+                            ->get();
+        $data_mahasiwa = DB::table('kampus_rencana_mahasiswa as krm')
+                    ->select('krm.id as id_tagihan_mahasiswa','krm.biaya','krm.id_mahasiswa')
+                    ->join('kampus_mahasiswa as km','krm.id_mahasiswa','=','km.id')
+                    ->join('kampus_prodi as kp','km.id_prodi','=','kp.id')
+                    ->join('master_kampus as mk','kp.id_kampus','=','mk.id')
+                    ->where('krm.tanggal_bayar',date('Y-m-d')) //date('Y-m-d')
+                    ->get();
 
-//         dd($data_group_mahasiwa,$data_mahasiwa);
-//         DB::transaction(function () use (&$data_group_mahasiwa,&$data_mahasiwa) {
-//             foreach($data_group_mahasiwa as $dgm){
-//                 if(DB::table('kampus_tagihan')->where('tanggal','like','%'.date('Y-m-d').'%')->count()==0){ //date('Y-m-d')
-//                     $id_transaksi = DB::table('kampus_tagihan')->insertGetId((array) $dgm);
+        DB::transaction(function () use (&$data_group_mahasiwa,&$data_mahasiwa) {
+            foreach($data_group_mahasiwa as $dgm){
+                if(KampusTagihan::where('tanggal','like','%'.date('Y-m-d').'%')->where('id_mahasiswa',$dgm->id_mahasiswa)->count()==0){
+                    $tagihan = new KampusTagihan();
+                    $tagihan->nomor_transaksi = $dgm->nomor_transaksi;
+                    $tagihan->tanggal = $dgm->tanggal;
+                    $tagihan->status = $dgm->status;
+                    $tagihan->id_mahasiswa = $dgm->id_mahasiswa;
+                    $tagihan->save();
 
-//                     foreach($data_mahasiwa as $dm){
-//                         DB::table('kampus_tagihan_detail')->insertGetId([
-//                             "id_transaksi"=>$id_transaksi,
-//                             "id_tagihan_mahasiswa"=>$dm->id_tagihan_mahasiswa,
-//                             "biaya"=>$dm->biaya
-//                         ]);
-//                     }
-//                 }
-//             }
-//         });
-// });
+                    foreach($data_mahasiwa as $dm){
+                        if($dgm->id_mahasiswa == $dm->id_mahasiswa){
+                            $tagihan_detail = new KampusTagihanDetail();
+                            $tagihan_detail-> id_transaksi = $tagihan->id;
+                            $tagihan_detail->id_tagihan_mahasiswa = $dm->id_tagihan_mahasiswa;
+                            $tagihan_detail->biaya = $dm->biaya;
+                            $tagihan_detail->save();
+                        }
+                    }
+                }
+            }
+        });
+});
