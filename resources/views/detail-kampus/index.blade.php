@@ -108,7 +108,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-8 col-12">
+            <div class="col-lg-8 col-12 order-first order-lg-last">
                 <div class="row">
                     <div class="col-lg-6 col-12">
                         <div class="card bg-c-green order-card">
