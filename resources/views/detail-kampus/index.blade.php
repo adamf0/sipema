@@ -65,22 +65,25 @@
 @section('content')
     <div class="container">
         <div class="row">
-            <div class="col-lg-auto">
-                <label for="tanggal" class="form-label">Tanggal</label>
-                <div class="d-flex flex-column flex-lg-row gap-2">
-                    <input type="date" name="tanggal" value="{{ now()->format('Y-m-d') }}" class="form-control">
-                    <button class="btn btn-primary">
-                        Filter
-                    </button>
-                </div>
-            </div>
-        </div>
-        <hr>
-        <div class="row">
             <div class="col-lg-4 col-12">
                 <div class="row">
                     <div class="col-12">
-                        <div class="card bg-white border shadow">
+                        <div class="card bg-white border shadow-none">
+                            <div class="card-block">
+                                <h6 class="m-b-20 fw-semibold">Filter Penagihan</h6>
+                                <hr>
+                                <label for="tanggal" class="form-label">Tanggal</label>
+                                <div class="d-flex flex-column flex-lg-row gap-2">
+                                    <input type="date" name="tanggal" value="{{ now()->format('Y-m-d') }}" class="form-control">
+                                    <button class="btn btn-primary">
+                                        Filter
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card bg-white border shadow-none">
                             <div class="card-block">
                                 <h6 class="m-b-20 fw-semibold">Penagihan</h6>
                                 <h2 class="text-end">
@@ -95,7 +98,7 @@
                         </div>
                     </div>
                     <div class="col-12">
-                        <div class="card bg-white border shadow">
+                        <div class="card bg-white border shadow-none">
                             <div class="card-block">
                                 <h6 class="m-b-20 fw-semibold">Grafik Penagihan</h6>
                                 <hr>
