@@ -9,8 +9,12 @@ class KampusTagihanDetail extends Model
     protected $table = 'kampus_tagihan_detail';
     public $timestamps = false;
 
-    public function kampus()
+    public function tagihan()
     {
-        return $this->belongsTo(KampusTagihan::class, 'id', 'id_transaksi');
+        return $this->belongsTo(KampusTagihan::class, 'id', 'id_transaksi');//belongsTo
+    }
+    public function rencana()
+    {
+        return $this->hasOne(KampusRencanaMahasiswa::class, 'id', 'id_tagihan_mahasiswa');
     }
 }

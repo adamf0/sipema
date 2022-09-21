@@ -8,8 +8,8 @@ use App\KampusMahasiswa;
 use App\KampusMou;
 use App\KampusProdi;
 use App\KampusTagihan;
-use Session;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class HomeController extends Controller
 {
@@ -84,16 +84,16 @@ class HomeController extends Controller
                                     $item->tagihan_detail->each(function($td,$index_) use($item){
                                         $item->total += $td->biaya;
                                     });
-                                });;
+                                });
             
             $data = [
                 "mou"=>KampusMou::whereKampus(Session::get('id_kampus'))->orderBy('tanggal_dibuat','DESC')->first(),
                 "prodi"=>KampusProdi::whereKampus(Session::get('id_kampus'))->get(),
                 "gelombang"=>KampusGelombang::whereKampus(Session::get('id_kampus'))->get(),
                 "item_bayar"=>KampusItemBayar::whereKampus(Session::get('id_kampus'))->get(),
-                "mahasiswa"=>KampusMahasiswa::with(['prodi'=>function($query){
+                "mahasiswa"=>KampusMahasiswa::whereHas('prodi',function($query){
                     $query->whereKampus(Session::get('id_kampus'));
-                }])->get(),
+                })->get(),
                 "tagihan"=>(object) [
                     "menunggu"=>$menunggu,
                     "selesai"=>$selesai,

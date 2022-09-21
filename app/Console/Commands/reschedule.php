@@ -42,7 +42,7 @@ class reschedule extends Command
             $jadwal_ulang_tagihan = DB::table('kampus_jadwal_ulang_tagihan')
                                         ->select('item_tagihan_selected')
                                         ->where('status',1)
-                                        ->where('tanggal_diundur','2022-09-20') //date('Y-m-d')
+                                        ->where('tanggal_diundur',date('Y-m-d')) //date('Y-m-d')
                                         ->get(); 
             $jadwal_ulang_tagihan = collect($jadwal_ulang_tagihan)->each(function($item,$index){ $item->item_tagihan_selected = json_decode($item->item_tagihan_selected); })
                                         ->pluck('item_tagihan_selected')

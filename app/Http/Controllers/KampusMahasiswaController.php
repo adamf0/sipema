@@ -6,9 +6,9 @@ use App\KampusItemBayar;
 use App\KampusMahasiswa;
 use App\KampusMou;
 use App\KampusProdi;
+use App\KampusRencanaMahasiswa;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -16,10 +16,9 @@ use Illuminate\Validation\Rule;
 
 class KampusMahasiswaController extends Controller
 {
-    public $id_kampus = null;
     public function __construct()
     {
-        // Auth::user()->id_kampus = auth()->user()->id_kampus;
+    
     }
     /**
      * Display a listing of the resource.
@@ -28,10 +27,7 @@ class KampusMahasiswaController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
-        // $user->load('user_kampus');
-
-        $mahasiswas = KampusMahasiswa::whereHas('prodi', function ($query) use (&$user) {
+        $mahasiswas = KampusMahasiswa::whereHas('prodi', function ($query){
             $query->whereKampus(Session::get('id_kampus'));
         })->simplePaginate(5);
 
@@ -46,9 +42,6 @@ class KampusMahasiswaController extends Controller
     public function create()
     {
         $prodis = KampusProdi::all(['id', 'kode_prodi', 'nama']);
-        $user = Auth::user();
-        $user->load('user_kampus');
-
         $itemBayars = KampusItemBayar::with(['gelombang', 'item'])
             ->whereKampus(Session::get('id_kampus'))
             ->where('status', 1)
@@ -136,9 +129,6 @@ class KampusMahasiswaController extends Controller
         }
 
         $data_kampus_rencana_mahasiswa = [];
-        $user = Auth::user();
-        $user->load('user_kampus');
-
         $mou = KampusMou::whereKampus(Session::get('id_kampus'))
             ->orderByDesc('tanggal_dibuat')
             ->first();
@@ -172,7 +162,7 @@ class KampusMahasiswaController extends Controller
                             "id_mahasiswa" => $mahasiswa->id,
                             "id_item_bayar" => $item_bayar_selected,
                             "id_biaya_potongan" => null,
-                            "nama" => $template_angsuran->nama,
+                            "nama" => "cicilan ke-$template_angsuran->nama",
                             "biaya" => $template_angsuran->nominal,
                             "tanggal_bayar" => $tanggal,
                             "status" => 0,
@@ -205,7 +195,13 @@ class KampusMahasiswaController extends Controller
      */
     public function show(KampusMahasiswa $kampusMahasiswa)
     {
-        abort(404);
+        $rencanas = KampusRencanaMahasiswa::with('item_bayar.item','tagihan_detail.tagihan')
+                        ->where('id_mahasiswa',$kampusMahasiswa->id)
+                        ->orderBy('tanggal_bayar','ASC')
+                        ->get()
+                        ->groupBy('tanggal_bayar');
+        // dd($rencanas[0]);
+        return view('kampus.mahasiswa.show', ['mahasiswa' => $kampusMahasiswa,'rencanas'=>$rencanas]);
     }
 
     /**
@@ -218,9 +214,6 @@ class KampusMahasiswaController extends Controller
     {
         $kampusMahasiswa->item_bayar_selected = array_map('intval', json_decode($kampusMahasiswa->item_bayar_selected));
         $prodis = KampusProdi::all(['id', 'kode_prodi', 'nama']);
-
-        $user = Auth::user();
-        $user->load('user_kampus');
 
         $itemBayars = KampusItemBayar::with(['gelombang', 'item'])
             ->whereKampus(Session::get('id_kampus'))
@@ -377,7 +370,7 @@ class KampusMahasiswaController extends Controller
                                 "id_mahasiswa" => $mahasiswa->id,
                                 "id_item_bayar" => $item_bayar_selected,
                                 "id_biaya_potongan" => null,
-                                "nama" => $template_angsuran->nama,
+                                "nama" => "cicilan ke-$template_angsuran->nama",
                                 "biaya" => $template_angsuran->nominal,
                                 "tanggal_bayar" => $tanggal,
                                 "status" => 0,

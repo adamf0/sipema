@@ -10,10 +10,8 @@ use Illuminate\Support\Facades\Validator;
 
 class KampusGelombangController extends Controller
 {
-    public $id_kampus = null;
     public function __construct()
     {
-        // Session::get('id_kampus') = auth()->user()->id_kampus;
     }
     /**
      * Display a listing of the resource.
@@ -22,9 +20,6 @@ class KampusGelombangController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
-        // $user->load('user_kampus');
-
         $gelombangs = KampusGelombang::whereKampus(Session::get('id_kampus'))->simplePaginate(5);
 
         return view('kampus.gelombang.index', ['gelombangs' => $gelombangs]);
