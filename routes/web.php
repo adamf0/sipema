@@ -65,7 +65,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('mou', 'AdminKampusMouController')->except('view');
         Route::resource('prodi', 'AdminKampusProdiController')->except('view');
         Route::resource('item-bayar', 'KampusItemBayarController')->except('view');
-        Route::resource('gelombang', 'KampusGelombangController')->except('view');
+        Route::resource('gelombang', 'AdminKampusGelombangController')->except('view');
         Route::resource('pembayaran', 'KampusPembayaranController')->except('view');
         Route::resource('mahasiswa', 'AdminKampusMahasiswaController')->except('view');
     });

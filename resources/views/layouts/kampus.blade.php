@@ -130,8 +130,8 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link {{ request()->routeIs('detail-kampus.gelombang.*') ? 'active' : 'link-dark' }}">
-                        [WIP] Gelombang
+                    <a href="{{ route('detail-kampus.gelombang.index', ['kampus' => $kampus->id]) }}" class="nav-link {{ request()->routeIs('detail-kampus.gelombang.*') ? 'active' : 'link-dark' }}">
+                        Gelombang
                     </a>
                 </li>
                 <li>
