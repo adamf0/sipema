@@ -135,8 +135,8 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link {{ request()->routeIs('detail-kampus.item-bayar.*') ? 'active' : 'link-dark' }}">
-                        [WIP] Item Bayar
+                    <a href="{{ route('detail-kampus.item-bayar.index', ['kampus' => $kampus->id]) }}" class="nav-link {{ request()->routeIs('detail-kampus.item-bayar.*') ? 'active' : 'link-dark' }}">
+                        Rincian Biaya
                     </a>
                 </li>
                 <li>
