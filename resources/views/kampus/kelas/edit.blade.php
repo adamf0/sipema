@@ -1,17 +1,20 @@
 @extends('layouts.app')
 
-@section('page-title', 'Edit Master Item : ' . $masterItem->nama)
+@section('page-title', 'Edit kelas : ' . $kelas->nama)
 
 @section('content')
-    <form action="{{ route('master.item.update', ['master_item' => $masterItem->id]) }}" method="POST">
+    <form action="{{ route('kampus.kelas.update', ['kampus_kelas' => $kelas->id]) }}" method="POST">
         <div class="card">
-            <div class="card-header">Form Master Item</div>
+            <div class="card-header">Form Metode Belajar</div>
             <div class="card-body">
                 @csrf
                 @method('PATCH')
+
                 <div class="mb-3">
-                    <label for="nama-master-item" class="form-label">Nama Master Item</label>
-                    <input type="text" name="nama" value="{{ old('nama', $masterItem->nama) }}" class="form-control @error('nama') is-invalid @enderror" id="nama-master-item" aria-describedby="nama-master-item" />
+                    <label for="nama" class="form-label">
+                        Nama Kelas
+                    </label>
+                    <input type="text" class="form-control @error('nama') is-invalid @enderror" value="{{ old('nama',$kelas->nama) }}" name="nama" id="nama">
                     @error('nama')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror

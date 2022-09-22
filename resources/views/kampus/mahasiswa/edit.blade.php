@@ -72,6 +72,7 @@
                     @enderror
                 </div>
 
+                @dd($itemBayars)
                 <div class="mb-3">
                     @foreach ($itemBayars as $index => $group)
                         @foreach ($group as $loop => $itemBayar)

@@ -2,19 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\KampusMou;
-use App\MasterKampus;
+use App\KampusKelas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
-class KampusMouController extends Controller
+class KampusKelasController extends Controller
 {
-    public $id_kampus = null;
-    public $kampus = [];
-    public function __construct()
-    {
-    }
     /**
      * Display a listing of the resource.
      *
@@ -22,10 +16,10 @@ class KampusMouController extends Controller
      */
     public function index()
     {
-        $kampusMous = KampusMou::whereKampus(Session::get('id_kampus'))->simplePaginate(5);
+        $kampus_kelas = kampusKelas::simplePaginate(5);
 
-        return view('kampus.mou.index', [
-            'kampusMous' => $kampusMous
+        return view('kampus.kelas.index', [
+            'kampusKelas' => $kampus_kelas
         ]);
     }
 
@@ -36,9 +30,7 @@ class KampusMouController extends Controller
      */
     public function create()
     {
-        $masterKampus = MasterKampus::all(['id', 'kode_kampus', 'nama_kampus']);
-
-        return view('kampus.mou.create', ['masterKampuss' => $masterKampus]);
+        return view('kampus.kelas.create');
     }
 
     /**
@@ -51,17 +43,14 @@ class KampusMouController extends Controller
     {
         $validator = Validator::make(
             $request->only([
-                'no_mou',
-                'sharing_fee'
+                'nama'
             ]),
             [
-                'no_mou' => ['required'],
-                'sharing_fee' => ['required', 'min:0.01'],
+                'nama' => ['required']
             ],
             [],
             [
-                'no_mou' => 'No. MOU',
-                'sharing_fee' => 'Sharing Fee',
+                'nama' => 'Nama Kelas'
             ]
         );
 
@@ -77,15 +66,12 @@ class KampusMouController extends Controller
                 ->withInput();
         }
 
-        $kampusMou = new KampusMou();
-        $kampusMou->no_mou = $request->no_mou;
-        $kampusMou->id_kampus = Session::get('id_kampus');
-        $kampusMou->sharing_fee = $request->sharing_fee;
-        $kampusMou->tanggal_dibuat = now()->format('Y-m-d');
-        $kampusMou->status = 0;
-        $kampusMou->save();
+        $kampus_kelas = new KampusKelas();
+        $kampus_kelas->id_kampus = Session::get('id_kampus');
+        $kampus_kelas->nama = $request->nama;
+        $kampus_kelas->save();
 
-        return redirect(route('kampus.mou.index'))
+        return redirect(route('kampus.kelas.index'))
             ->with('flash_message', (object)[
                 'type' => 'success',
                 'title' => 'Sukses',
@@ -96,10 +82,10 @@ class KampusMouController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\KampusMou  $kampusMou
+     * @param  \App\KampusKelas  $kampus_kelas
      * @return \Illuminate\Http\Response
      */
-    public function show(KampusMou $kampusMou)
+    public function show(KampusKelas $kampus_kelas)
     {
         abort(404);
     }
@@ -107,41 +93,33 @@ class KampusMouController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\KampusMou  $kampusMou
+     * @param  \App\KampusKelas  $kampus_kelas
      * @return \Illuminate\Http\Response
      */
-    public function edit(KampusMou $kampusMou)
+    public function edit(KampusKelas $kampus_kelas)
     {
-        $masterKampus = MasterKampus::all(['id', 'kode_kampus', 'nama_kampus']);
-
-        return view('kampus.mou.edit', [
-            'masterKampuss' => $masterKampus,
-            'kampusMou' => $kampusMou
-        ]);
+        return view('kampus.kelas.edit',['kelas'=>$kampus_kelas]);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\KampusMou  $kampusMou
+     * @param  \App\KampusKelas  $kampus_kelas
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, KampusMou $kampusMou)
+    public function update(Request $request, KampusKelas $kampus_kelas)
     {
         $validator = Validator::make(
             $request->only([
-                'no_mou',
-                'sharing_fee'
+                'nama'
             ]),
             [
-                'no_mou' => ['required'],
-                'sharing_fee' => ['required', 'min:0.01'],
+                'nama' => ['required']
             ],
             [],
             [
-                'no_mou' => 'No. MOU',
-                'sharing_fee' => 'Sharing Fee',
+                'nama' => 'Nama Kelas'
             ]
         );
 
@@ -157,14 +135,12 @@ class KampusMouController extends Controller
                 ->withInput();
         }
 
-        $kampusMou->no_mou = $request->no_mou;
-        $kampusMou->id_kampus = Session::get('id_kampus');
-        $kampusMou->sharing_fee = $request->sharing_fee;
-        $kampusMou->tanggal_dibuat = now()->format('Y-m-d');
+        $kampus_kelas->id_kampus = Session::get('id_kampus');
+        $kampus_kelas->nama = $request->nama;
 
-        if (!$kampusMou->getDirty()) {
+        if (!$kampus_kelas->getDirty()) {
             return redirect()
-                ->route('kampus.mou.index')
+                ->route('kampus.kelas.index')
                 ->with('flash_message', (object)[
                     'type' => 'warning',
                     'title' => 'Peringatan',
@@ -172,9 +148,9 @@ class KampusMouController extends Controller
                 ]);
         }
 
-        $kampusMou->save();
+        $kampus_kelas->save();
 
-        return redirect(route('kampus.mou.index'))
+        return redirect(route('kampus.kelas.index'))
             ->with('flash_message', (object)[
                 'type' => 'success',
                 'title' => 'Sukses',
@@ -185,13 +161,13 @@ class KampusMouController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\KampusMou  $kampusMou
+     * @param  \App\KampusKelas  $kampus_kelas
      * @return \Illuminate\Http\Response
      */
-    public function destroy(KampusMou $kampusMou)
+    public function destroy(KampusKelas $kampus_kelas)
     {
-        if (!$kampusMou->delete()) {
-            return redirect(route('kampus.mou.index'))
+        if (!$kampus_kelas->delete()) {
+            return redirect(route('kampus.kelas.index'))
                 ->with('flash_message', (object)[
                     'type' => 'danger',
                     'title' => 'Terjadi Kesalahan',
@@ -199,33 +175,11 @@ class KampusMouController extends Controller
                 ]);
         }
 
-        return redirect(route('kampus.mou.index'))
+        return redirect(route('kampus.kelas.index'))
             ->with('flash_message', (object)[
                 'type' => 'success',
                 'title' => 'Sukses',
                 'message' => 'Berhasil Menghapus Data'
             ]);
-    }
-
-    public function change($id){
-        $kampusMou = KampusMou::findOrFail($id);
-        $kampusMou->status = 1;
-
-        if(KampusMou::where('id','!=',$kampusMou->id)->update(["status"=>0]) && $kampusMou->save()){
-            return redirect(route('kampus.mou.index'))
-            ->with('flash_message', (object)[
-                'type' => 'success',
-                'title' => 'Sukses',
-                'message' => 'Berhasil Merubah Status'
-            ]);
-        }
-        else{
-            return redirect(route('kampus.mou.index'))
-            ->with('flash_message', (object)[
-                'type' => 'danger',
-                'title' => 'Danger',
-                'message' => 'Gagal Merubah Status'
-            ]);
-        }
     }
 }

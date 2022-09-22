@@ -10,7 +10,7 @@
 @section('content')
     <form action="{{ route('kampus.mou.store') }}" method="POST">
         <div class="card">
-            <div class="card-header">Form Kampus MOU</div>
+            <div class="card-header">Form MOU</div>
             <div class="card-body">
                 @csrf
                 <div class="mb-3">
@@ -20,33 +20,10 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-                <!-- <div class="mb-3">
-                    <label for="kampus" class="form-label">
-                        Kampus
-                    </label>
-                    <select class="form-select @error('kampus') is-invalid @enderror" name="kampus" id="kampus">
-                        <option value="" {{ $errors->get('kampus') ? '' : 'selected' }}>Pilih Kampus</option>
-                        @foreach ($masterKampuss as $masterKampus)
-                            <option value="{{ $masterKampus->id }}" {{ old('kampus') == $masterKampus->id ? 'selected' : '' }}>{{ ucwords($masterKampus->nama_kampus) }}</option>
-                        @endforeach
-                    </select>
-                    @error('kampus')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div> -->
                 <div class="mb-3">
-                    <label for="max-reschedule" class="form-label">Max. Penjadwalan Ulang</label>
-                    <input type="number" name="max_reschedule" id="max-reschedule" value="{{ old('max_reschedule') }}" aria-describedby="max-reschedule" class="form-control @error('max_reschedule') is-invalid @enderror" />
-                    @error('max_reschedule')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-                <div class="form-check mb-3">
-                    <input type="checkbox" name="status_gelombang" {{ old('status_gelombang') ? 'checked' : '' }} value="1" id="status-gelombang" class="form-check-input @error('status_gelombang') is-invalid @enderror">
-                    <label class="form-check-label" for="status-gelombang">
-                        Status Gelombang
-                    </label>
-                    @error('status_gelombang')
+                    <label for="sharing_fee" class="form-label">Sharing Fee</label>
+                    <input type="number" step="0.01" min="0.01" max="1" name="sharing_fee" id="sharing_fee" value="{{ old('sharing_fee') }}" aria-describedby="sharing_fee" class="form-control @error('sharing_fee') is-invalid @enderror" />
+                    @error('sharing_fee')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
@@ -60,20 +37,4 @@
 
 @push('js')
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-    <script>
-        // In your Javascript (external .js resource or <script> tag)
-        $(document).ready(function() {
-            $('#kampus').select2({
-                theme: 'bootstrap-5'
-            });
-
-            $("#kampus + span").addClass("w-100");
-
-            @error('kampus')
-                $("#kampus + span").addClass("is-invalid");
-            @enderror
-        });
-    </script>
 @endpush

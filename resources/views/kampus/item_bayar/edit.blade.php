@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('page-title', 'Edit Item Bayar : '.$item_bayar->item->nama.' Tahun Akademik ' . $item_bayar->tahun_akademik)
+@section('page-title', 'Edit Rincian Biaya : '.$item_bayar->item->nama.' Tahun Akademik ' . $item_bayar->tahun_akademik)
 
 @push('css')
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -10,7 +10,7 @@
 @section('content')
     <form action="{{ route('kampus.item-bayar.update', ['item-bayar' => $item_bayar->id]) }}" method="POST">
         <div class="card">
-            <div class="card-header">Form Item Bayar</div>
+            <div class="card-header">Form Rincian Biaya</div>
             <div class="card-body">
                 @csrf
                 @method('PATCH')
@@ -39,41 +39,55 @@
                     <select class="form-select" name="id_prodi" id="id_prodi" required>
                         <option value="">Pilih Prodi</option>
                         @foreach ($prodis as $prodi)
-                            <option value="{{ $prodi->id }}" {{ ($prodi->id==$item_bayar->id_prodi? "selected":"") }}>{{ ucwords($prodi->nama) }}</option>
+                            <option value="{{ $prodi->id }}" {{ ($prodi->id==$item_bayar->id_prodi? "selected":"") }}>{{ ucwords($prodi->nama) }} ({{ ucwords($prodi->jenjang) }})</option>
                         @endforeach
                     </select>
                 </div>
 
                 <div class="mb-3">
-                    <label for="id_kelompok" class="form-label">
-                        Kelompok
+                    <label for="id_kelas" class="form-label">
+                        Kelas
                     </label>
-                    <select class="form-select" name="id_kelompok" id="id_kelompok" required>
-                        <option value="">Pilih Kelompok</option>
-                        @foreach ($kelompoks as $kelompok)
-                            <option value="{{ $kelompok->id }}" {{ ($kelompok->id==$item_bayar->id_kelompok? "selected":"") }}>{{ ucwords($kelompok->nama) }}</option>
+                    <select class="form-select" name="id_kelas" id="id_kelas" required>
+                        <option value="">Pilih Kelas</option>
+                        @foreach ($kelass as $kelas)
+                            <option value="{{ $kelas->id }}" {{ ($kelas->id==$item_bayar->id_kelas? "selected":"") }}>{{ ucwords($kelas->nama) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_metode_belajar" class="form-label">
+                        Metode Belajar
+                    </label>
+                    <select class="form-select" name="id_metode_belajar" id="id_metode_belajar" required>
+                        <option value="">Pilih Metode Belajar</option>
+                        @foreach ($metode_belajars as $metode_belajar)
+                            <option value="{{ $metode_belajar->id }}" {{ ($metode_belajar->id==$item_bayar->id_metode_belajar? "selected":"") }}>{{ ucwords($metode_belajar->nama) }}</option>
                         @endforeach
                     </select>
                 </div>
 
                 <div class="mb-3">
                     <label for="id_item" class="form-label">
-                        Item
+                        Komponen Biaya
                     </label>
                     <select class="form-select" name="id_item" id="id_item" required>
-                        <option value="">Pilih Item</option>
+                        <option value="">Pilih Komponen Biaya</option>
                         @foreach ($items as $item)
                             <option value="{{ $item->id }}" {{ ($item->id==$item_bayar->id_item? "selected":"") }}>{{ ucwords($item->nama) }}</option>
                         @endforeach
                     </select>
                 </div>
 
+                <input type="hidden" name="jenis" value="{{$item_bayar->jenis}}">
+
                 <div class="mb-3">
                     <label for="nominal" class="form-label">Nominal</label>
                     <input type="text" name="nominal" class="form-control" id="nominal" value="{{ $item_bayar->nominal }}" min="1" required/>
                 </div>
 
-                @if ($item_bayar->type==1)
+                @if ($item_bayar->type==1 && ($item_bayar->jenis=="bulanan" || $item_bayar->jenis=="angsuran"))
                     <div class="mb-3">
                         <table class="table table-responsive" id="table">
                             <thead>
@@ -90,7 +104,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
-                @else
+                @elseif($item_bayar->type==0 && $item_bayar->jenis=="bulanan")
                     <div class="mb-3">
                         <table class="table table-responsive" id="table">
                             <thead>
@@ -120,7 +134,7 @@
                 @endif
             </div>
             <div class="card-footer text-muted">
-                @if ($item_bayar->type==1)
+                @if ($item_bayar->type==1 && ($item_bayar->jenis=="bulanan" || $item_bayar->jenis=="angsuran"))
                     <button type="button" class="btn btn-success btn-gen">Cek Generate Biaya</button>
                 @endif
                 <button type="submit" class="btn btn-primary">Simpan</button>

@@ -6,7 +6,7 @@ use App\MasterItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class MasterItemController extends Controller
+class KampusItemController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,7 +17,7 @@ class MasterItemController extends Controller
     {
         $masterItems = MasterItem::simplePaginate(5);
 
-        return view('master.item.index', [
+        return view('kampus.item.index', [
             'masterItems' => $masterItems
         ]);
     }
@@ -29,7 +29,7 @@ class MasterItemController extends Controller
      */
     public function create()
     {
-        return view('master.item.create');
+        return view('kampus.item.create');
     }
 
     /**
@@ -54,7 +54,7 @@ class MasterItemController extends Controller
         );
 
         if ($validator->fails()) {
-            return redirect(route('master.item.create'))
+            return redirect(route('kampus.item.create'))
                 ->with('flash_message', (object)[
                     'type' => 'danger',
                     'title' => 'Terjadi Kesalahan',
@@ -68,7 +68,7 @@ class MasterItemController extends Controller
         $masterItem->nama = $request->nama;
         $masterItem->save();
 
-        return redirect(route('master.item.index'))
+        return redirect(route('kampus.item.index'))
             ->with('flash_message', (object)[
                 'type' => 'success',
                 'title' => 'Sukses',
@@ -95,7 +95,7 @@ class MasterItemController extends Controller
      */
     public function edit(MasterItem $masterItem)
     {
-        return view('master.item.edit', [
+        return view('kampus.item.edit', [
             'masterItem' => $masterItem
         ]);
     }
@@ -138,7 +138,7 @@ class MasterItemController extends Controller
 
         if (!$masterItem->getDirty()) {
             return redirect()
-                ->route('master.item.index')
+                ->route('kampus.item.index')
                 ->with('flash_message', (object)[
                     'type' => 'warning',
                     'title' => 'Peringatan',
@@ -148,7 +148,7 @@ class MasterItemController extends Controller
 
         $masterItem->save();
 
-        return redirect(route('master.item.index'))
+        return redirect(route('kampus.item.index'))
             ->with('flash_message', (object)[
                 'type' => 'success',
                 'title' => 'Sukses',
@@ -165,7 +165,7 @@ class MasterItemController extends Controller
     public function destroy(MasterItem $masterItem)
     {
         if (!$masterItem->delete()) {
-            return redirect(route('master.item.index'))
+            return redirect(route('kampus.item.index'))
                 ->with('flash_message', (object)[
                     'type' => 'danger',
                     'title' => 'Terjadi Kesalahan',
@@ -173,7 +173,7 @@ class MasterItemController extends Controller
                 ]);
         }
 
-        return redirect(route('master.item.index'))
+        return redirect(route('kampus.item.index'))
             ->with('flash_message', (object)[
                 'type' => 'success',
                 'title' => 'Sukses',

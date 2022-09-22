@@ -30,20 +30,18 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('kampus')->name('kampus.')->group(function () {
         Route::resource('mou', 'KampusMouController')->parameter('mou', 'kampus_mou');
+        Route::get('mou/change-status/{id}', 'KampusMouController@change')->name('mou.change');
+
         Route::resource('prodi', 'KampusProdiController')->parameter('prodi', 'kampus_prodi');
+        Route::resource('metode_belajar', 'KampusMetodeBelajarController')->parameter('metode_belajar', 'kampus_metode_belajar');
+        Route::resource('kelas', 'KampusKelasController')->parameter('kelas', 'kampus_kelas');
+        Route::resource('item', 'KampusItemController')->except('view')->parameter('item', 'master_item'); //migrasi ke kampus
         Route::resource('item-bayar', 'KampusItemBayarController')->parameter('item-bayar', 'kampus_item_bayar');
         Route::resource('gelombang', 'KampusGelombangController')->parameter('gelombang', 'kampus_gelombang');
+        
         Route::resource('pembayaran', 'KampusPembayaranController')->parameter('pambayaran', 'kampus_pembayaran');
         Route::resource('mahasiswa', 'KampusMahasiswaController')->parameter('mahasiswa', 'kampus_mahasiswa');
         Route::resource('jadwal_ulang', 'KampusJadwalUlangTagihan')->parameter('mahasiswa', 'kampus_mahasiswa');
-        // Route::prefix('jadwal_ulang')->name('jadwal_ulang.')->group(function () {
-        //     Route::get('/', 'KampusJadwalUlangTagihan@index')->name('index'); 
-        //     Route::get('/create', 'KampusJadwalUlangTagihan@create')->name('create'); 
-        //     Route::get('/edit/{id}', 'KampusJadwalUlangTagihan@edit')->name('edit');            
-        //     Route::post('/store', 'KampusJadwalUlangTagihan@store')->name('store');  
-        //     Route::post('/update/{id}', 'KampusJadwalUlangTagihan@update')->name('update'); 
-        //     Route::get('/{id}', 'KampusJadwalUlangTagihan@delete')->name('destroy'); 
-        // });
         Route::get('switch/{id_kampus}/{to}', function ($id_kampus, $to) {
             foreach (Auth::user()->load('user_kampus')->user_kampus as $kampus) {
                 if ($kampus->id_kampus == $id_kampus) {
@@ -59,10 +57,8 @@ Route::middleware(['auth'])->group(function () {
     
     Route::prefix('master')->name('master.')->group(function () {
         Route::resource('user', 'MasterUserController')->except('view')->parameter('user', 'user');
-        Route::resource('item', 'MasterItemController')->except('view')->parameter('item', 'master_item');
         Route::resource('channel-pembayaran', 'MasterChannelPembayaranController')->except('view');
         Route::resource('kampus', 'MasterKampusController')->except('view')->parameter('kampus', 'master_kampus');
-        Route::resource('kelompok', 'MasterKelompokController')->parameter('kelompok', 'master_kelompok');
         Route::resource('tipe-biaya-potongan', 'MasterTipeBiayaPotonganController')->except('view')->parameter('tipe-biaya-potongan', 'master_tipe_biaya_potongan');
     });
 

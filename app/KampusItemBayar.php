@@ -36,9 +36,13 @@ class KampusItemBayar extends Model
     {
         return $this->hasOne(KampusProdi::class,'id','id_prodi');
     }
-    public function kelompok()
+    public function kelas()
     {
-        return $this->hasOne(MasterKelompok::class,'id','id_kelompok');
+        return $this->hasOne(KampusKelas::class,'id','id_kelas');
+    }
+    public function metode_belajar()
+    {
+        return $this->hasOne(KampusMetodeBelajar::class,'id','id_metode_belajar');
     }
     public function rencana()
     {
