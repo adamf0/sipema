@@ -176,16 +176,6 @@
                     <hr class="w-100" />
                 </div>
                 <ul class="nav nav-pills flex-column mb-auto px-3">
-                    <li class="nav-item">
-                        <a href="{{ route('master.item.index') }}" class="nav-link {{ request()->routeIs('master.item.*') ? 'active' : 'link-dark' }}">
-                            Master Item
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('master.kelompok.index') }}" class="nav-link {{ request()->routeIs('master.kelompok.*') ? 'active' : 'link-dark' }}">
-                            Master Kelompok
-                        </a>
-                    </li>
                     <li>
                         <a href="{{ route('master.kampus.index') }}" class="nav-link {{ request()->routeIs('master.kampus.*') ? 'active' : 'link-dark' }}">
                             Master Kampus
@@ -220,8 +210,23 @@
                         </a>
                     </li>
                     <li>
+                        <a href="{{ route('kampus.item.index') }}" class="nav-link {{ request()->routeIs('kampus.item.*') ? 'active' : 'link-dark' }}">
+                            Komponen Biaya
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{ route('kampus.prodi.index') }}" class="nav-link {{ request()->routeIs('kampus.prodi.*') ? 'active' : 'link-dark' }}">
                             Prodi
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('kampus.kelas.index') }}" class="nav-link {{ request()->routeIs('kampus.kelas.*') ? 'active' : 'link-dark' }}">
+                            Kelas
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('kampus.metode_belajar.index') }}" class="nav-link {{ request()->routeIs('kampus.metode_belajar.*') ? 'active' : 'link-dark' }}">
+                            Metode Belajar
                         </a>
                     </li>
                     <li>
@@ -231,7 +236,7 @@
                     </li>
                     <li>
                         <a href="{{ route('kampus.item-bayar.index') }}" class="nav-link {{ request()->routeIs('kampus.item-bayar.*') ? 'active' : 'link-dark' }}">
-                            Item Bayar
+                            Rincian Biaya
                         </a>
                     </li>
                     <li>

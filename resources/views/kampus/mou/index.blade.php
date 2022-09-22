@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('page-title', 'Kampus MOU')
+@section('page-title', 'MOU')
 
 @section('content')
     <div class="d-flex justify-content-between mb-2">
@@ -13,9 +13,9 @@
                     <th>ID</th>
                     <th>No. MOU</th>
                     <!-- <th>Kampus</th> -->
-                    <th>Status Gelombang</th>
-                    <th>Max Reschedule</th>
+                    <th>Sharing Fee</th>
                     <th>Tanggal Dibuat</th>
+                    <th>Status</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -24,14 +24,15 @@
                     <tr>
                         <th>{{ $kampusMou->id }}</th>
                         <td>{{ $kampusMou->no_mou }}</td>
-                        <!-- <td>{{ $kampusMou->kampus->nama_kampus }}</td> -->
-                        <td>
-                            <div class="badge bg-{{ $kampusMou->status_gelombang ? 'success' : 'danger' }}">
-                                {{ $kampusMou->status_gelombang ? 'Aktif' : 'Nonaktif' }}
-                            </div>
-                        </td>
-                        <td>{{ $kampusMou->max_reschedule }}</td>
+                        <td>{{ ($kampusMou->sharing_fee*100) }}%</td>
                         <td>{{ $kampusMou->tanggal_dibuat->format('d F Y') }}</td>
+                        <td>
+                            @if ($kampusMou->status==1)
+                                <label class="badge bg-success">Aktif</label>
+                            @else
+                                <label class="badge bg-danger">Non-Aktif</label>
+                            @endif
+                        </td>
                         <td>
                             <div class="d-flex gap-2">
                                 <a href="{{ route('kampus.mou.edit', ['kampus_mou' => $kampusMou->id]) }}" class="btn btn-warning btn-sm">Edit</a>
@@ -40,6 +41,9 @@
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
                                 </form>
+                                @if ($kampusMou->status==0)
+                                <a href="{{ route('kampus.mou.change', ['id' => $kampusMou->id]) }}" class="btn btn-primary btn-sm">Aktif</a>
+                                @endif
                             </div>
                         </td>
                     </tr>

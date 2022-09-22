@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('page-title', 'Tambah Item Bayar')
+@section('page-title', 'Tambah Rician Biaya')
 
 @push('css')
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -15,7 +15,7 @@
 @section('content')
     <form action="{{ route('kampus.item-bayar.store') }}" method="POST">
         <div class="card">
-            <div class="card-header">Form Item Bayar</div>
+            <div class="card-header">Form Rician Biaya</div>
             <div class="card-body">
                 @csrf
                 <div class="mb-3">
@@ -42,32 +42,57 @@
                     <select class="form-select" name="id_prodi" id="id_prodi" required>
                         <option value="">Pilih Prodi</option>
                         @foreach ($prodis as $prodi)
-                            <option value="{{ $prodi->id }}">{{ ucwords($prodi->nama) }}</option>
+                            <option value="{{ $prodi->id }}">{{ ucwords($prodi->nama) }} ({{ ucwords($prodi->jenjang) }})</option>
                         @endforeach
                     </select>
                 </div>
 
                 <div class="mb-3">
-                    <label for="id_kelompok" class="form-label">
-                        Kelompok
+                    <label for="id_kelas" class="form-label">
+                        Kelas
                     </label>
-                    <select class="form-select" name="id_kelompok" id="id_kelompok" required>
-                        <option value="">Pilih Kelompok</option>
-                        @foreach ($kelompoks as $kelompok)
-                            <option value="{{ $kelompok->id }}">{{ ucwords($kelompok->nama) }}</option>
+                    <select class="form-select" name="id_kelas" id="id_kelas" required>
+                        <option value="">Pilih Kelas</option>
+                        @foreach ($kelass as $kelas)
+                            <option value="{{ $kelas->id }}">{{ ucwords($kelas->nama) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_metode_belajar" class="form-label">
+                        Metode Belajar
+                    </label>
+                    <select class="form-select" name="id_metode_belajar" id="id_metode_belajar" required>
+                        <option value="">Pilih Metode Belajar</option>
+                        @foreach ($metode_belajars as $metode_belajar)
+                            <option value="{{ $metode_belajar->id }}">{{ ucwords($metode_belajar->nama) }}</option>
                         @endforeach
                     </select>
                 </div>
 
                 <div class="mb-3">
                     <label for="id_item" class="form-label">
-                        Item
+                        Komponen Biaya
                     </label>
                     <select class="form-select" name="id_item" id="id_item" required>
-                        <option value="">Pilih Item</option>
+                        <option value="">Pilih Komponen Biaya</option>
                         @foreach ($items as $item)
                             <option value="{{ $item->id }}">{{ ucwords($item->nama) }}</option>
                         @endforeach
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_type" class="form-label">
+                        Tipe Pembayaran
+                    </label>
+                    <select class="form-select" name="jenis" id="jenis" required>
+                        <option value="">Pilih Tipe</option>
+                        <option value="bulanan">Bulanan</option>
+                        <option value="insidentil">Insidentil</option>
+                        <option value="angsuran">Angsuran</option>
+                        <option value="open">Open</option>
                     </select>
                 </div>
 
@@ -156,6 +181,9 @@
 
     <script type="text/javascript">
         let nominal = 0;
+        var jenis = null; 
+        $('#nav-tab').hide();
+        $('#nav-tabContent').hide();
 
         // function initMaskMoney() {
         //     $('.money').maskMoney({prefix:'Rp ', thousands:'.', decimal:',', affixesStay: true}); 
@@ -208,13 +236,7 @@
         document.querySelector('.btn-gen').onclick = generate
         $('#nominal').on('change keyup', function() {
            nominal = $(this).val();
-           
-           if(nominal == 0){
-            $('.btn-gen').prop('disabled', true);
-           }
-           else{
-            $('.btn-gen').prop('disabled', false);
-           }
+           changeJenisNominal();
         })
         $('.generate').click(function() {
             // $('#type_input').val('generate');
@@ -224,6 +246,54 @@
             // $('#type_input').val('custom');
             $('.btn-gen').hide();
         })
+        $('#jenis').on('change', function(e) {
+            // $("#elementId :selected").text();
+            jenis = $(this).val();
+            changeJenisNominal();
+        });
+        function changeJenisNominal(){
+            if(jenis=="bulanan"){
+                $('.btn-add').show();
+                if(nominal == 0){
+                    $('.btn-gen').prop('disabled', true);
+                    $('.btn-gen').hide();
+                    $('#nav-tab').hide();
+                    $('#nav-tabContent').hide();
+                }
+                else{
+                    $('.btn-gen').prop('disabled', false);
+                    $('.btn-gen').show();
+                    $('#nav-tab').show();
+                    $('#nav-tabContent').show();
+                }
+            }
+            else if(jenis=="insidentil"){
+                $('.btn-gen').prop('disabled', true);
+                $('.btn-gen').hide();
+                $('#nav-tab').hide();
+                $('#nav-tabContent').hide();
+            }
+            else if(jenis=="angsuran"){
+                $('.btn-gen').prop('disabled', true);
+                $('#nav-tab').hide();
+                $('.btn-add').hide();
+                if(nominal == 0){                    
+                    $('.btn-gen').hide();
+                    $('#nav-tabContent').hide();
+                }
+                else{
+                    $('.btn-gen').show();
+                    $('#nav-tabContent').show();
+                }
+            }
+            else{
+                $('.btn-gen').prop('disabled', true);
+                $('#nav-tab').hide();
+                $('.btn-add').hide();
+                $('.btn-gen').hide();
+                $('#nav-tabContent').hide();
+            }
+        }
 
         function arrayMax(arr) {
             return arr.reduce(function (p, v) {

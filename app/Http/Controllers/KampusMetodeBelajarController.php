@@ -2,16 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\MasterKelompok;
+use App\KampusMetodeBelajar;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
-class MasterKelompokController extends Controller
+class KampusMetodeBelajarController extends Controller
 {
-    public function __construct()
-    {
-
-    }
     /**
      * Display a listing of the resource.
      *
@@ -19,8 +16,11 @@ class MasterKelompokController extends Controller
      */
     public function index()
     {
-        $kelompoks = MasterKelompok::simplePaginate(5);
-        return view('master.kelompok.index',['kelompoks'=>$kelompoks]);
+        $kampusMetodes = KampusMetodeBelajar::simplePaginate(5);
+
+        return view('kampus.metode_belajar.index', [
+            'kampusMetodes' => $kampusMetodes
+        ]);
     }
 
     /**
@@ -30,7 +30,7 @@ class MasterKelompokController extends Controller
      */
     public function create()
     {
-        return view('master.kelompok.create');
+        return view('kampus.metode_belajar.create');
     }
 
     /**
@@ -50,7 +50,7 @@ class MasterKelompokController extends Controller
             ],
             [],
             [
-                'nama' => 'Nama'
+                'nama' => 'Nama Metode Belajar'
             ]
         );
 
@@ -65,35 +65,27 @@ class MasterKelompokController extends Controller
                 ->withErrors($validator)
                 ->withInput();
         }
-        
-        $kelompok = new MasterKelompok();
-        $kelompok->nama = $request->nama;
 
-        if($kelompok->save()){
-            return redirect(route('master.kelompok.index'))
-                ->with('flash_message', (object)[
-                    'type' => 'success',
-                    'title' => 'Sukses',
-                    'message' => 'Berhasil Menambah Data'
-                ]);
-        }
-        else{
-            return redirect(route('master.kelompok.index'))
-                ->with('flash_message', (object)[
-                    'type' => 'danger',
-                    'title' => 'Terjadi Kesalahan',
-                    'message' => 'Silahkan Coba Kembali.'
-                ]);
-        }
+        $kampus_metode_belajar = new KampusMetodeBelajar();
+        $kampus_metode_belajar->id_kampus = Session::get('id_kampus');
+        $kampus_metode_belajar->nama = $request->nama;
+        $kampus_metode_belajar->save();
+
+        return redirect(route('kampus.metode_belajar.index'))
+            ->with('flash_message', (object)[
+                'type' => 'success',
+                'title' => 'Sukses',
+                'message' => 'Berhasil Menambah Data'
+            ]);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\KampusMetodeBelajar  $kampus_metode_belajar
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(KampusMetodeBelajar $kampus_metode_belajar)
     {
         abort(404);
     }
@@ -101,22 +93,22 @@ class MasterKelompokController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\KampusMetodeBelajar  $kampus_metode_belajar
      * @return \Illuminate\Http\Response
      */
-    public function edit(MasterKelompok $master_kelompok)
+    public function edit(KampusMetodeBelajar $kampus_metode_belajar)
     {
-        return view('master.kelompok.edit',['kelompok'=>$master_kelompok]);
+        return view('kampus.metode_belajar.edit',['metode_belajar'=>$kampus_metode_belajar]);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\KampusMetodeBelajar  $kampus_metode_belajar
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, MasterKelompok $master_kelompok)
+    public function update(Request $request, KampusMetodeBelajar $kampus_metode_belajar)
     {
         $validator = Validator::make(
             $request->only([
@@ -127,7 +119,7 @@ class MasterKelompokController extends Controller
             ],
             [],
             [
-                'nama' => 'Nama'
+                'nama' => 'Nama Metode Belajar'
             ]
         );
 
@@ -143,11 +135,12 @@ class MasterKelompokController extends Controller
                 ->withInput();
         }
 
-        $master_kelompok->nama = $request->nama;
+        $kampus_metode_belajar->id_kampus = Session::get('id_kampus');
+        $kampus_metode_belajar->nama = $request->nama;
 
-        if (!$master_kelompok->getDirty()) {
+        if (!$kampus_metode_belajar->getDirty()) {
             return redirect()
-                ->route('master.kelompok.index')
+                ->route('kampus.metode_belajar.index')
                 ->with('flash_message', (object)[
                     'type' => 'warning',
                     'title' => 'Peringatan',
@@ -155,47 +148,38 @@ class MasterKelompokController extends Controller
                 ]);
         }
 
-        if($master_kelompok->save()){
-            return redirect(route('master.kelompok.index'))
+        $kampus_metode_belajar->save();
+
+        return redirect(route('kampus.metode_belajar.index'))
             ->with('flash_message', (object)[
                 'type' => 'success',
                 'title' => 'Sukses',
                 'message' => 'Berhasil Mengubah Data'
             ]);
-        }
-        else{
-            return redirect(route('master.kelompok.index'))
-                ->with('flash_message', (object)[
-                    'type' => 'danger',
-                    'title' => 'Terjadi Kesalahan',
-                    'message' => 'Silahkan Coba Kembali.'
-                ]);
-        }            
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\KampusMetodeBelajar  $kampus_metode_belajar
      * @return \Illuminate\Http\Response
      */
-    public function destroy(MasterKelompok $master_kelompok)
+    public function destroy(KampusMetodeBelajar $kampus_metode_belajar)
     {
-        if($master_kelompok->delete()){
-            return redirect(route('master.kelompok.index'))
-            ->with('flash_message', (object)[
-                'type' => 'success',
-                'title' => 'Sukses',
-                'message' => 'Berhasil Menghapus Data'
-            ]);
-        }
-        else{
-            return redirect(route('master.kelompok.index'))
+        if (!$kampus_metode_belajar->delete()) {
+            return redirect(route('kampus.metode_belajar.index'))
                 ->with('flash_message', (object)[
                     'type' => 'danger',
                     'title' => 'Terjadi Kesalahan',
                     'message' => 'Silahkan Coba Kembali.'
                 ]);
         }
+
+        return redirect(route('kampus.metode_belajar.index'))
+            ->with('flash_message', (object)[
+                'type' => 'success',
+                'title' => 'Sukses',
+                'message' => 'Berhasil Menghapus Data'
+            ]);
     }
 }
