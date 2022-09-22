@@ -62,7 +62,7 @@ class KampusItemBayarController extends Controller
      */
     public function store(Request $request)
     {   
-        dd($request->all());
+        // dd($request->all());
         DB::transaction(function () use (&$request) {
             $anggaran = [];
             $anggaran_custom = [];

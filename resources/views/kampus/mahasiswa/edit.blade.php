@@ -72,7 +72,6 @@
                     @enderror
                 </div>
 
-                @dd($itemBayars)
                 <div class="mb-3">
                     @foreach ($itemBayars as $index => $group)
                         @foreach ($group as $loop => $itemBayar)
@@ -81,7 +80,7 @@
                             <select name="item_bayar_selected[{{ $index }}]" id="item_bayar_selected_{{$index}}" class="form-select @error('item_bayar_selected.*') is-invalid @enderror">
                                 <option value="" {{ $errors->get('item_bayar_selected') ? '' : 'selected' }}>Pilih Jumlah Angsuran</option>
                             @endif
-                            <option value="{{$itemBayar->id}}" {{ old('item_bayar_selected.*', $mahasiswa->item_bayar_selected[$index]) == $itemBayar->id ? 'selected' : '' }}>x{{$itemBayar->jumlah_angsuran}}</option>
+                            <option value="{{$itemBayar->id}}" {{ old('item_bayar_selected.*', isset($mahasiswa->item_bayar_selected[$index])? $mahasiswa->item_bayar_selected[$index]:"") == $itemBayar->id ? 'selected' : '' }}>x{{$itemBayar->jumlah_angsuran}}</option>
 
                             <script>console.log(<?php echo json_encode($mahasiswa->item_bayar_selected); ?>);</script>
                             <script>console.log(<?php echo json_encode($itemBayar->id); ?>);</script>                                
