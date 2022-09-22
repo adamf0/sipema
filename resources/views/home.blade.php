@@ -86,24 +86,29 @@
                 <div class="col-lg-4 col-12">
                     <div class="row">
                         <div class="col-12">
-                            <div class="card bg-white border">
+                            <div class="card bg-white border shadow-none">
                                 <div class="card-block">
-                                    <h6 class="m-b-20 fw-semibold">Filter Penagihan</h6>
+                                    <h6 class="fw-semibold">Filter Penagihan</h6>
                                     <hr>
-                                    <label for="tanggal" class="form-label">Tanggal</label>
-                                    <div class="d-flex flex-column flex-lg-row gap-2">
-                                        <input type="date" name="tanggal" value="{{ now()->format('Y-m-d') }}" class="form-control">
-                                        <button class="btn btn-primary">
-                                            Filter
-                                        </button>
-                                    </div>
+                                    <form action="{{ route('home') }}">
+                                        <label for="filter_tanggal" class="form-label">Tanggal <span class="fw-semibold">({{ \Carbon\Carbon::parse($filter_tanggal)->format('d F Y') }})</span></label>
+                                        <div class="d-flex flex-column flex-lg-row gap-2">
+                                            <input type="date" name="filter_tanggal" required max="{{ now()->format('Y-m-d') }}" value="{{ $filter_tanggal }}" class="form-control @error('filter_tanggal') is-invalid @enderror">
+                                            <button type="submit" class="btn btn-primary">
+                                                Filter
+                                            </button>
+                                        </div>
+                                        @error('filter_tanggal')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                    </form>
                                 </div>
                             </div>
                         </div>
                         <div class="col-12">
-                            <div class="card bg-white border">
+                            <div class="card bg-white border shadow-none">
                                 <div class="card-block">
-                                    <h6 class="m-b-20 fw-semibold">Penagihan</h6>
+                                    <h6 class="fw-semibold">Penagihan</h6>
                                     <h2 class="text-end">
                                         <span>{{ $tagihan->menunggu->count() + $tagihan->selesai->count() + $tagihan->jadwal_ulang->count() }}</span>
                                     </h2>
@@ -116,9 +121,9 @@
                             </div>
                         </div>
                         <div class="col-12">
-                            <div class="card bg-white border">
+                            <div class="card bg-white border shadow-none">
                                 <div class="card-block">
-                                    <h6 class="m-b-20 fw-semibold">Grafik Penagihan</h6>
+                                    <h6 class="fw-semibold">Grafik Penagihan</h6>
                                     <hr>
                                     <canvas id="chart"></canvas>
                                 </div>
