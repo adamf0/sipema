@@ -12,6 +12,7 @@ use App\KampusProdi;
 use App\KampusTagihan;
 use App\MasterKampus;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Validator;
 
 class DetailKampusController extends Controller
 {
@@ -20,13 +21,50 @@ class DetailKampusController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(MasterKampus $kampus)
+    public function index(MasterKampus $kampus, Request $request)
     {
+        if ($request->filter_tanggal) {
+            $validator = Validator::make(
+                $request->only('filter_tanggal'),
+                [
+                    'filter_tanggal' => [
+                        'date',
+                        'date_format:Y-m-d',
+                        'before_or_equal:now'
+                    ]
+                ],
+                [
+                    'filter_tanggal.date' => ':attribute yang di inputkan harus berisi tanggal yang valid.',
+                    'filter_tanggal.date_format' => ':attribute tidak cocok dengan format yang telah ditentukan.',
+                    'filter_tanggal.before_or_equal' => ':attribute harus berisi tanggal sebelum atau sama dengan tanggal sekarang.'
+                ],
+                [
+                    'filter_tanggal' => 'Tanggal'
+                ]
+            );
+
+            if ($validator->fails()) {
+                return redirect()
+                    ->back()
+                    ->with('flash_message', (object)[
+                        'type' => 'danger',
+                        'title' => 'Terjadi Kesalahan',
+                        'message' => 'Silahkan cek kembali Filter Tanggal'
+                    ])
+                    ->withErrors($validator)
+                    ->withInput();
+            }
+
+            $filter_tanggal = $request->filter_tanggal;
+        } else {
+            $filter_tanggal = now()->format('Y-m-d');
+        }
+
         $menunggu = KampusTagihan::with(['mahasiswa', 'tagihan_detail'])
             ->whereHas('mahasiswa.prodi', function ($query) use ($kampus) {
                 $query->whereKampus($kampus->id);
             })
-            ->now()
+            ->where('tanggal', $filter_tanggal)
             ->waiting()
             ->get()
             ->each(function ($item, $index) {
@@ -39,7 +77,7 @@ class DetailKampusController extends Controller
             ->whereHas('mahasiswa.prodi', function ($query) use ($kampus) {
                 $query->whereKampus($kampus->id);
             })
-            ->now()
+            ->where('tanggal', $filter_tanggal)
             ->settlement()
             ->get()
             ->each(function ($item, $index) {
@@ -53,7 +91,7 @@ class DetailKampusController extends Controller
             ->whereHas('mahasiswa.prodi', function ($query) use ($kampus) {
                 $query->whereKampus($kampus->id);
             })
-            ->now()
+            ->where('tanggal', $filter_tanggal)
             ->reschedule()
             ->get()
             ->each(function ($item, $index) {
@@ -67,7 +105,7 @@ class DetailKampusController extends Controller
             ->whereHas('mahasiswa.prodi', function ($query) use ($kampus) {
                 $query->whereKampus($kampus->id);
             })
-            ->old()
+            ->where('tanggal', $filter_tanggal)
             ->waiting()
             ->get()
             ->each(function ($item, $index) {
@@ -78,6 +116,7 @@ class DetailKampusController extends Controller
             });
 
         $data = [
+            "filter_tanggal" => $filter_tanggal,
             "kampus" => $kampus,
             "mou" => KampusMou::whereKampus($kampus->id)->orderBy('tanggal_dibuat', 'DESC')->first(),
             "prodi" => KampusProdi::whereKampus($kampus->id)->get(),

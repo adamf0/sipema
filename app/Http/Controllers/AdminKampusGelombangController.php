@@ -4,25 +4,26 @@ namespace App\Http\Controllers;
 
 use App\KampusGelombang;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
+use App\Http\Controllers\Controller;
+use App\KampusItemBayar;
+use App\MasterKampus;
 use Illuminate\Support\Facades\Validator;
 
-class KampusGelombangController extends Controller
+class AdminKampusGelombangController extends Controller
 {
-    public function __construct()
-    {
-    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(MasterKampus $kampus)
     {
-        $gelombangs = KampusGelombang::whereKampus(Session::get('id_kampus'))->simplePaginate(5);
+        $gelombangs = KampusGelombang::whereKampus($kampus->id)->simplePaginate(5);
 
-        return view('kampus.gelombang.index', ['gelombangs' => $gelombangs]);
+        return view('detail-kampus.gelombang.index', [
+            'kampus' => $kampus,
+            'gelombangs' => $gelombangs
+        ]);
     }
 
     /**
@@ -30,9 +31,11 @@ class KampusGelombangController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(MasterKampus $kampus)
     {
-        return view('kampus.gelombang.create');
+        return view('detail-kampus.gelombang.create', [
+            'kampus' => $kampus
+        ]);
     }
 
     /**
@@ -41,7 +44,7 @@ class KampusGelombangController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(MasterKampus $kampus, Request $request)
     {
         $validator = Validator::make(
             $request->only([
@@ -74,14 +77,17 @@ class KampusGelombangController extends Controller
                 ->withInput();
         }
 
-        $kampusGelombang = new KampusGelombang();
-        $kampusGelombang->id_kampus = Session::get('id_kampus');
-        $kampusGelombang->nama_gelombang = $request->nama_gelombang;
-        $kampusGelombang->tanggal_mulai = $request->tanggal_mulai;
-        $kampusGelombang->tanggal_akhir = $request->tanggal_akhir;
-        $kampusGelombang->save();
+        $gelombang = new KampusGelombang();
+        $gelombang->id_kampus = $kampus->id;
+        $gelombang->nama_gelombang = $request->nama_gelombang;
+        $gelombang->tanggal_mulai = $request->tanggal_mulai;
+        $gelombang->tanggal_akhir = $request->tanggal_akhir;
+        $gelombang->save();
 
-        return redirect(route('kampus.gelombang.index'))
+        return redirect()
+            ->route('detail-kampus.gelombang.index', [
+                'kampus' => $kampus->id
+            ])
             ->with('flash_message', (object)[
                 'type' => 'success',
                 'title' => 'Sukses',
@@ -92,10 +98,10 @@ class KampusGelombangController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\KampusGelombang  $kampusGelombang
+     * @param  \App\KampusGelombang  $gelombang
      * @return \Illuminate\Http\Response
      */
-    public function show(KampusGelombang $kampusGelombang)
+    public function show(KampusGelombang $gelombang)
     {
         abort(404);
     }
@@ -103,13 +109,14 @@ class KampusGelombangController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\KampusGelombang  $kampusGelombang
+     * @param  \App\KampusGelombang  $gelombang
      * @return \Illuminate\Http\Response
      */
-    public function edit(KampusGelombang $kampusGelombang)
+    public function edit(MasterKampus $kampus, KampusGelombang $gelombang)
     {
-        return view('kampus.gelombang.edit', [
-            'gelombang' => $kampusGelombang
+        return view('detail-kampus.gelombang.edit', [
+            'kampus' => $kampus,
+            'gelombang' => $gelombang
         ]);
     }
 
@@ -117,10 +124,10 @@ class KampusGelombangController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\KampusGelombang  $kampusGelombang
+     * @param  \App\KampusGelombang  $gelombang
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, KampusGelombang $kampusGelombang)
+    public function update(MasterKampus $kampus, Request $request, KampusGelombang $gelombang)
     {
         $validator = Validator::make(
             $request->only([
@@ -153,14 +160,16 @@ class KampusGelombangController extends Controller
                 ->withInput();
         }
 
-        $kampusGelombang->id_kampus = Session::get('id_kampus');
-        $kampusGelombang->nama_gelombang = $request->nama_gelombang;
-        $kampusGelombang->tanggal_mulai = $request->tanggal_mulai;
-        $kampusGelombang->tanggal_akhir = $request->tanggal_akhir;
+        $gelombang->id_kampus = $kampus->id;
+        $gelombang->nama_gelombang = $request->nama_gelombang;
+        $gelombang->tanggal_mulai = $request->tanggal_mulai;
+        $gelombang->tanggal_akhir = $request->tanggal_akhir;
 
-        if (!$kampusGelombang->getDirty()) {
+        if (!$gelombang->getDirty()) {
             return redirect()
-                ->route('kampus.gelombang.index')
+                ->route('detail-kampus.gelombang.index', [
+                    'kampus' => $kampus->id
+                ])
                 ->with('flash_message', (object)[
                     'type' => 'warning',
                     'title' => 'Peringatan',
@@ -168,9 +177,12 @@ class KampusGelombangController extends Controller
                 ]);
         }
 
-        $kampusGelombang->save();
+        $gelombang->save();
 
-        return redirect(route('kampus.gelombang.index'))
+        return redirect()
+            ->route('detail-kampus.gelombang.index', [
+                'kampus' => $kampus->id
+            ])
             ->with('flash_message', (object)[
                 'type' => 'success',
                 'title' => 'Sukses',
@@ -181,13 +193,16 @@ class KampusGelombangController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\KampusGelombang  $kampusGelombang
+     * @param  \App\KampusGelombang  $gelombang
      * @return \Illuminate\Http\Response
      */
-    public function destroy(KampusGelombang $kampusGelombang)
+    public function destroy(MasterKampus $kampus, KampusGelombang $gelombang)
     {
-        if (!$kampusGelombang->delete()) {
-            return redirect(route('kampus.gelombang.index'))
+        if (!$gelombang->delete()) {
+            return redirect()
+                ->route('detail-kampus.gelombang.index', [
+                    'kampus' => $kampus->id
+                ])
                 ->with('flash_message', (object)[
                     'type' => 'danger',
                     'title' => 'Terjadi Kesalahan',
@@ -195,7 +210,10 @@ class KampusGelombangController extends Controller
                 ]);
         }
 
-        return redirect(route('kampus.gelombang.index'))
+        return redirect()
+            ->route('detail-kampus.gelombang.index', [
+                'kampus' => $kampus->id
+            ])
             ->with('flash_message', (object)[
                 'type' => 'success',
                 'title' => 'Sukses',

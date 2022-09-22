@@ -65,24 +65,32 @@
 @section('content')
     <div class="container">
         <div class="row">
-            <div class="col-lg-auto">
-                <label for="tanggal" class="form-label">Tanggal</label>
-                <div class="d-flex flex-column flex-lg-row gap-2">
-                    <input type="date" name="tanggal" value="{{ now()->format('Y-m-d') }}" class="form-control">
-                    <button class="btn btn-primary">
-                        Filter
-                    </button>
-                </div>
-            </div>
-        </div>
-        <hr>
-        <div class="row">
             <div class="col-lg-4 col-12">
                 <div class="row">
                     <div class="col-12">
-                        <div class="card bg-white border shadow">
+                        <div class="card bg-white border shadow-none">
                             <div class="card-block">
-                                <h6 class="m-b-20 fw-semibold">Penagihan</h6>
+                                <h6 class="fw-semibold">Filter Penagihan</h6>
+                                <hr>
+                                <form action="{{ route('detail-kampus.dashboard', ['kampus' => $kampus]) }}">
+                                    <label for="filter_tanggal" class="form-label">Tanggal <span class="fw-semibold">({{ \Carbon\Carbon::parse($filter_tanggal)->format('d F Y') }})</span></label>
+                                    <div class="d-flex flex-column flex-lg-row gap-2">
+                                        <input type="date" name="filter_tanggal" required max="{{ now()->format('Y-m-d') }}" value="{{ $filter_tanggal }}" class="form-control @error('filter_tanggal') is-invalid @enderror">
+                                        <button type="submit" class="btn btn-primary">
+                                            Filter
+                                        </button>
+                                    </div>
+                                    @error('filter_tanggal')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card bg-white border shadow-none">
+                            <div class="card-block">
+                                <h6 class="fw-semibold">Penagihan</h6>
                                 <h2 class="text-end">
                                     <span>{{ $tagihan->menunggu->count() + $tagihan->selesai->count() + $tagihan->jadwal_ulang->count() }}</span>
                                 </h2>
@@ -95,9 +103,9 @@
                         </div>
                     </div>
                     <div class="col-12">
-                        <div class="card bg-white border shadow">
+                        <div class="card bg-white border shadow-none">
                             <div class="card-block">
-                                <h6 class="m-b-20 fw-semibold">Grafik Penagihan</h6>
+                                <h6 class="fw-semibold">Grafik Penagihan</h6>
                                 <hr>
                                 <canvas id="chart"></canvas>
                             </div>
@@ -105,12 +113,12 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-8 col-12">
+            <div class="col-lg-8 col-12 order-first order-lg-last">
                 <div class="row">
                     <div class="col-lg-6 col-12">
                         <div class="card bg-c-green order-card">
                             <div class="card-block">
-                                <h6 class="m-b-20 fw-semibold">Prodi</h6>
+                                <h6 class="fw-semibold">Prodi</h6>
                                 <h2 class="text-end fw-semibold">
                                     <!-- <i class="fa fa-rocket f-left"></i> -->
                                     <span>{{ $prodi->count() }}</span>
@@ -123,7 +131,7 @@
                     <div class="col-lg-6 col-12">
                         <div class="card bg-c-yellow order-card">
                             <div class="card-block">
-                                <h6 class="m-b-20 fw-semibold">Gelombang</h6>
+                                <h6 class="fw-semibold">Gelombang</h6>
                                 <h2 class="text-end fw-semibold">
                                     <!-- <i class="fa fa-refresh f-left"></i> -->
                                     <span>{{ $gelombang->count() }}</span>
@@ -136,7 +144,7 @@
                     <div class="col-lg-6 col-12">
                         <div class="card bg-c-pink order-card">
                             <div class="card-block">
-                                <h6 class="m-b-20 fw-semibold">Item Bayar</h6>
+                                <h6 class="fw-semibold">Item Bayar</h6>
                                 <h2 class="text-end fw-semibold">
                                     <!-- <i class="fa fa-credit-card f-left"></i> -->
                                     <span>{{ $item_bayar->count() }}</span>
@@ -149,7 +157,7 @@
                     <div class="col-lg-6 col-12">
                         <div class="card bg-c-blue order-card">
                             <div class="card-block">
-                                <h6 class="m-b-20 fw-semibold">Mahasiswa</h6>
+                                <h6 class="fw-semibold">Mahasiswa</h6>
                                 <h2 class="text-end fw-semibold">
                                     <!-- <i class="fa fa-cart-plus f-left"></i> -->
                                     <span>{{ $mahasiswa->count() }}</span>
