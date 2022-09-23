@@ -145,8 +145,8 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link {{ request()->routeIs('detail-kampus.pembayaran.*') ? 'active' : 'link-dark' }}">
-                        [WIP] Metode Pembayaran
+                    <a href="{{ route('detail-kampus.pembayaran.index', ['kampus' => $kampus->id]) }}" class="nav-link {{ request()->routeIs('detail-kampus.pembayaran.*') ? 'active' : 'link-dark' }}">
+                        Metode Pembayaran
                     </a>
                 </li>
                 <li>

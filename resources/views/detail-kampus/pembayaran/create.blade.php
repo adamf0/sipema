@@ -1,9 +1,11 @@
-@extends('layouts.app')
+@extends('layouts.kampus')
 
-@section('page-title', 'Tambah Metode Pembayaran')
+@section('nama-kampus', $kampus->nama_kampus)
+
+@section('page-title', 'Tambah Metode Pembayaran Kampus')
 
 @section('content')
-    <form action="{{ route('kampus.pembayaran.store') }}" method="POST">
+    <form action="{{ route('detail-kampus.pembayaran.store', ['kampus' => $kampus->id]) }}" method="POST">
         <div class="card">
             <div class="card-header">Form Metode Pembayaran Kampus</div>
             <div class="card-body">

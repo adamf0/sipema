@@ -22,6 +22,11 @@ class MasterKampus extends Model
 
     public function user_kampus()
     {
-        return $this->belongsTo(UserKampus::class,'id_kampus','id');
+        return $this->belongsTo(UserKampus::class, 'id_kampus', 'id');
+    }
+
+    public function metodePembayaran()
+    {
+        return $this->hasMany(KampusPembayaran::class, 'id_kampus', 'id');
     }
 }
