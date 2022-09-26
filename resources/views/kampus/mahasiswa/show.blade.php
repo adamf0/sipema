@@ -20,10 +20,11 @@
 @section('content')
 <div class="row">
     <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">Pembayaran Bulanan</div>
-            <div class="card-body">
-                <table class="table table-responsive table-bordered text-center align-middle" id="bulanan">
+    <div class="card">
+        <div class="card-header">Rencana Pembayaran Mahasiswa</div>
+        <div class="card-body">
+            <div class="overflow-auto">
+                <table class="table table-responsive table-bordered text-center align-middle">
                     <thead>
                         <tr>
                             <th>Tanggal</th>
@@ -105,4 +106,3 @@
         </div>
     </div>
 </div>
-@endsection

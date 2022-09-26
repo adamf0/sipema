@@ -93,7 +93,7 @@
     </nav>
     <div class="navbar navbar-expand-lg bg-light">
         <div class="container">
-            <div class="navbar-brand fw-semibold text-break">
+            <div class="navbar-brand fw-semibold text-break text-wrap">
                 <h6 class="text-muted mb-0">
                     @yield('nama-kampus')
                 </h6>
@@ -135,8 +135,8 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link {{ request()->routeIs('detail-kampus.item-bayar.*') ? 'active' : 'link-dark' }}">
-                        [WIP] Item Bayar
+                    <a href="{{ route('detail-kampus.item-bayar.index', ['kampus' => $kampus->id]) }}" class="nav-link {{ request()->routeIs('detail-kampus.item-bayar.*') ? 'active' : 'link-dark' }}">
+                        Rincian Biaya
                     </a>
                 </li>
                 <li>
@@ -145,8 +145,8 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link {{ request()->routeIs('detail-kampus.pembayaran.*') ? 'active' : 'link-dark' }}">
-                        [WIP] Metode Pembayaran
+                    <a href="{{ route('detail-kampus.pembayaran.index', ['kampus' => $kampus->id]) }}" class="nav-link {{ request()->routeIs('detail-kampus.pembayaran.*') ? 'active' : 'link-dark' }}">
+                        Metode Pembayaran
                     </a>
                 </li>
                 <li>

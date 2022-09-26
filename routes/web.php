@@ -40,7 +40,6 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('kelas', 'KampusKelasController')->parameter('kelas', 'kampus_kelas');
         Route::resource('lulusan', 'KampusLulusanController')->parameter('lulusan', 'kampus_lulusan');
         Route::resource('item-bayar', 'KampusItemBayarController')->parameter('item-bayar', 'kampus_item_bayar');
- 
         Route::resource('pembayaran', 'KampusPembayaranController')->parameter('pambayaran', 'kampus_pembayaran');
         Route::resource('mahasiswa', 'KampusMahasiswaController')->parameter('mahasiswa', 'kampus_mahasiswa');
         Route::resource('tagihan', 'KampusTagihanController')->parameter('tagihan', 'kampus_tagihan');
@@ -59,7 +58,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::resource('biaya-potongan', 'BiayaPotonganController')->parameter('biaya_potong', 'biaya_potongan');
-    
+
     Route::prefix('master')->name('master.')->group(function () {
         Route::resource('user', 'MasterUserController')->except('view')->parameter('user', 'user');
         Route::resource('channel-pembayaran', 'MasterChannelPembayaranController')->except('view');
@@ -71,9 +70,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', 'DetailKampusController@index')->name('dashboard');
         Route::resource('mou', 'AdminKampusMouController')->except('view');
         Route::resource('prodi', 'AdminKampusProdiController')->except('view');
-        Route::resource('item-bayar', 'KampusItemBayarController')->except('view');
+        Route::resource('item-bayar', 'AdminKampusItemBayarController')->except('view');
         Route::resource('gelombang', 'AdminKampusGelombangController')->except('view');
-        Route::resource('pembayaran', 'KampusPembayaranController')->except('view');
+        Route::resource('pembayaran', 'AdminKampusPembayaranController')->except('view', 'edit', 'update');
         Route::resource('mahasiswa', 'AdminKampusMahasiswaController')->except('view');
     });
 });
@@ -105,9 +104,9 @@ Route::get('tes-transaksi', function(){
                     ->get();
         dd($data_group_mahasiwa,$data_mahasiwa);
 
-        DB::transaction(function () use (&$data_group_mahasiwa,&$data_mahasiwa) {
-            foreach($data_group_mahasiwa as $dgm){
-                if(KampusTagihan::where('tanggal','like','%'.date('Y-m-d').'%')->where('id_mahasiswa',$dgm->id_mahasiswa)->count()==0){
+        DB::transaction(function () use (&$data_group_mahasiwa, &$data_mahasiwa) {
+            foreach ($data_group_mahasiwa as $dgm) {
+                if (KampusTagihan::where('tanggal', 'like', '%' . date('Y-m-d') . '%')->where('id_mahasiswa', $dgm->id_mahasiswa)->count() == 0) {
                     $tagihan = new KampusTagihan();
                     $tagihan->nomor_transaksi = $dgm->nomor_transaksi;
                     $tagihan->tanggal = $dgm->tanggal;
@@ -115,10 +114,10 @@ Route::get('tes-transaksi', function(){
                     $tagihan->id_mahasiswa = $dgm->id_mahasiswa;
                     $tagihan->save();
 
-                    foreach($data_mahasiwa as $dm){
-                        if($dgm->id_mahasiswa == $dm->id_mahasiswa){
+                    foreach ($data_mahasiwa as $dm) {
+                        if ($dgm->id_mahasiswa == $dm->id_mahasiswa) {
                             $tagihan_detail = new KampusTagihanDetail();
-                            $tagihan_detail-> id_transaksi = $tagihan->id;
+                            $tagihan_detail->id_transaksi = $tagihan->id;
                             $tagihan_detail->id_tagihan_mahasiswa = $dm->id_tagihan_mahasiswa;
                             $tagihan_detail->biaya = $dm->biaya;
                             $tagihan_detail->save();

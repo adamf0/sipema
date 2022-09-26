@@ -93,7 +93,7 @@
     </nav>
     <div class="navbar navbar-expand-lg bg-light">
         <div class="container">
-            <div class="navbar-brand fw-semibold text-break">
+            <div class="navbar-brand fw-semibold text-break text-wrap">
                 @yield('page-title')
             </div>
         </div>

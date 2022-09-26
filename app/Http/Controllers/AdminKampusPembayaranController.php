@@ -3,32 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\KampusPembayaran;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\MasterChannelPembayaran;
 use App\MasterKampus;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
-class KampusPembayaranController extends Controller
+class AdminKampusPembayaranController extends Controller
 {
-    public $id_kampus = null;
-    public function __construct()
-    {
-        // Auth::user()->id_kampus = auth()->user()->id_kampus;
-    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(MasterKampus $kampus)
     {
         $kampusPembayaran = KampusPembayaran::with('chanel_pembayaran')
-            ->whereKampus(Session::get('id_kampus'))
+            ->whereKampus($kampus->id)
             ->simplePaginate(5);
 
-        return view('kampus.pembayaran.index', [
+        return view('detail-kampus.pembayaran.index', [
+            'kampus' => $kampus,
             'kampusPembayarans' => $kampusPembayaran
         ]);
     }
@@ -38,20 +33,23 @@ class KampusPembayaranController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(MasterKampus $kampus)
     {
-        $kampus = MasterKampus::where('id', Session::get('id_kampus'))->first();
-
+        // dd($kampus->metodePembayaran->pluck('id_chanel_pembayaran')->toArray());
+        // dd(MasterChannelPembayaran::whereNotIn('id', $kampus->metodePembayaran->pluck('id_chanel_pembayaran')->toArray())->get());
         $chanel_pembayarans = MasterChannelPembayaran::whereNotIn('id', $kampus->metodePembayaran->pluck('id_chanel_pembayaran')->toArray())->get();
 
         if ($chanel_pembayarans->count() >= 1) {
-            return view('kampus.pembayaran.create', [
+            return view('detail-kampus.pembayaran.create', [
+                'kampus' => $kampus,
                 'chanel_pembayarans' => $chanel_pembayarans
             ]);
         }
 
         return redirect()
-            ->route('kampus.pembayaran.index')
+            ->route('detail-kampus.pembayaran.index', [
+                'kampus' => $kampus->id
+            ])
             ->with('flash_message', (object)[
                 'type' => 'warning',
                 'title' => 'Peringatan',
@@ -65,7 +63,7 @@ class KampusPembayaranController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(MasterKampus $kampus, Request $request)
     {
         $validator = Validator::make(
             $request->only([
@@ -93,12 +91,15 @@ class KampusPembayaranController extends Controller
         }
 
         $kampusPembayaran = new KampusPembayaran();
-        $kampusPembayaran->id_kampus = Session::get('id_kampus');
+        $kampusPembayaran->id_kampus = $kampus->id;
         $kampusPembayaran->id_chanel_pembayaran = $request->id_chanel_pembayaran;
         $kampusPembayaran->status = 1;
         $kampusPembayaran->save();
 
-        return redirect(route('kampus.pembayaran.index'))
+        return redirect()
+            ->route('detail-kampus.pembayaran.index', [
+                'kampus' => $kampus->id
+            ])
             ->with('flash_message', (object)[
                 'type' => 'success',
                 'title' => 'Sukses',
@@ -123,16 +124,9 @@ class KampusPembayaranController extends Controller
      * @param  \App\KampusPembayaran  $kampusPembayaran
      * @return \Illuminate\Http\Response
      */
-    public function edit(KampusPembayaran $pembayaran)
+    public function edit(KampusPembayaran $kampusPembayaran)
     {
         abort(404);
-        // $chanel_pembayarans = MasterChannelPembayaran::all();
-        // $pembayaran->load('chanel_pembayaran');
-
-        // return view('kampus.pembayaran.edit', [
-        //     'chanel_pembayarans' => $chanel_pembayarans,
-        //     'kampusPembayaran' => $pembayaran
-        // ]);
     }
 
     /**
@@ -142,68 +136,22 @@ class KampusPembayaranController extends Controller
      * @param  \App\KampusPembayaran  $kampusPembayaran
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, KampusPembayaran $pembayaran)
+    public function update(Request $request, KampusPembayaran $kampusPembayaran)
     {
         abort(404);
-        // $validator = Validator::make(
-        //     $request->only([
-        //         'id_chanel_pembayaran'
-        //     ]),
-        //     [
-        //         'id_chanel_pembayaran' => ['required']
-        //     ],
-        //     [],
-        //     [
-        //         'id_chanel_pembayaran' => 'Canel Pembayaran'
-        //     ]
-        // );
-
-        // if ($validator->fails()) {
-        //     return redirect()
-        //         ->back()
-        //         ->with('flash_message', (object)[
-        //             'type' => 'danger',
-        //             'title' => 'Terjadi Kesalahan',
-        //             'message' => 'Silahkan cek kembali Form'
-        //         ])
-        //         ->withErrors($validator)
-        //         ->withInput();
-        // }
-
-        // $pembayaran->id_kampus = Session::get('id_kampus');
-        // $pembayaran->id_chanel_pembayaran = $request->id_chanel_pembayaran;
-        // $pembayaran->status = 1;
-
-        // if (!$pembayaran->getDirty()) {
-        //     return redirect()
-        //         ->route('kampus.pembayaran.index')
-        //         ->with('flash_message', (object)[
-        //             'type' => 'warning',
-        //             'title' => 'Peringatan',
-        //             'message' => 'Perubahan Dibatalkan karena tidak ada perubahan'
-        //         ]);
-        // }
-
-        // $pembayaran->save();
-
-        // return redirect(route('kampus.pembayaran.index'))
-        //     ->with('flash_message', (object)[
-        //         'type' => 'success',
-        //         'title' => 'Sukses',
-        //         'message' => 'Berhasil Menambah Data'
-        //     ]);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\KampusPembayaran  $kampusPembayaran
+     * @param  \App\KampusPembayaran  $pembayaran
      * @return \Illuminate\Http\Response
      */
-    public function destroy(KampusPembayaran $pembayaran)
+    public function destroy(MasterKampus $kampus, KampusPembayaran $pembayaran)
     {
         if (!$pembayaran->delete()) {
-            return redirect(route('kampus.pembayaran.index'))
+            return redirect()
+                ->route('detail-kampus.pembayaran.index', ['kampus' => $kampus->id])
                 ->with('flash_message', (object)[
                     'type' => 'danger',
                     'title' => 'Terjadi Kesalahan',
@@ -211,7 +159,8 @@ class KampusPembayaranController extends Controller
                 ]);
         }
 
-        return redirect(route('kampus.pembayaran.index'))
+        return redirect()
+            ->route('detail-kampus.pembayaran.index', ['kampus' => $kampus->id])
             ->with('flash_message', (object)[
                 'type' => 'success',
                 'title' => 'Sukses',
