@@ -18,7 +18,7 @@ class KampusMahasiswa extends Model
      *
      * @var bool
      */
-    public $timestamps = false;
+    public $timestamps = true;
 
     public function scopeWhereKampus($query,$id_kampus)
     {

@@ -19,8 +19,15 @@
             <div class="card-body">
                 @csrf
                 <div class="mb-3">
-                    <label for="tahun_akademik" class="form-label">Tahun Akademik</label>
-                    <input type="text" name="tahun_akademik" class="form-control" id="tahun_akademik" required/>
+                    <label for="tahun_akademik" class="form-label">
+                        Tahun Akademik
+                    </label>
+                    <select class="form-select" name="tahun_akademik" id="tahun_akademik" required>
+                        <option value="">Pilih Tahun Akademik</option>
+                        @foreach ($tahun_akademiks as $tahun_akademik)
+                            <option value="{{ $tahun_akademik->id }}">{{ ucwords($tahun_akademik->nama) }}</option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div class="mb-3">
@@ -67,6 +74,18 @@
                         <option value="">Pilih Metode Belajar</option>
                         @foreach ($metode_belajars as $metode_belajar)
                             <option value="{{ $metode_belajar->id }}">{{ ucwords($metode_belajar->nama) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_lulusan" class="form-label">
+                        Lulusan
+                    </label>
+                    <select class="form-select" name="id_lulusan" id="id_lulusan" required>
+                        <option value="">Pilih Lulusan</option>
+                        @foreach ($lulusans as $lulusan)
+                            <option value="{{ $lulusan->id }}">{{ ucwords($lulusan->nama) }}</option>
                         @endforeach
                     </select>
                 </div>
