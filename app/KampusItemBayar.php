@@ -44,6 +44,10 @@ class KampusItemBayar extends Model
     {
         return $this->hasOne(KampusMetodeBelajar::class,'id','id_metode_belajar');
     }
+    public function lulusan()
+    {
+        return $this->hasOne(KampusLulusan::class,'id','id_lulusan');
+    }
     public function rencana()
     {
         return $this->belongsTo(KampusRencanaMahasiswa::class, 'id_item_bayar', 'id');

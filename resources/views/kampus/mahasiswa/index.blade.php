@@ -42,6 +42,7 @@
                         <td>{{ $mahasiswa->kampusMou->no_mou ?? 'Tidak Ditemukan' }}</td>
                         <td>
                             <div class="d-flex gap-2">
+                                <a href="#" class="btn btn-secondary btn-sm">Tagihan</a>
                                 <a href="{{ route('kampus.mahasiswa.show', ['mahasiswa' => $mahasiswa->id]) }}" class="btn btn-primary btn-sm">Rencana</a>
                                 <a href="{{ route('kampus.mahasiswa.edit', ['mahasiswa' => $mahasiswa->id]) }}" class="btn btn-warning btn-sm">Edit</a>
                                 <form action="{{ route('kampus.mahasiswa.destroy', ['mahasiswa' => $mahasiswa->id]) }}" method="post">

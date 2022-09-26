@@ -51,6 +51,7 @@ class kampus_tagihan extends Command
                             ->join('kampus_mahasiswa as km','krm.id_mahasiswa','=','km.id')
                             ->join('kampus_prodi as kp','km.id_prodi','=','kp.id')
                             ->join('master_kampus as mk','kp.id_kampus','=','mk.id')
+                            ->whereNotNull('krm.tanggal_bayar')
                             ->where('krm.tanggal_bayar',date('Y-m-d')) //date('Y-m-d')
                             ->groupBy('krm.id_mahasiswa')
                             ->get();
@@ -59,6 +60,7 @@ class kampus_tagihan extends Command
                     ->join('kampus_mahasiswa as km','krm.id_mahasiswa','=','km.id')
                     ->join('kampus_prodi as kp','km.id_prodi','=','kp.id')
                     ->join('master_kampus as mk','kp.id_kampus','=','mk.id')
+                    ->whereNotNull('krm.tanggal_bayar')
                     ->where('krm.tanggal_bayar',date('Y-m-d')) //date('Y-m-d')
                     ->get();
 

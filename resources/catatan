@@ -1,0 +1,6 @@
+tahun_akademik pada tbl kampusitembayar dipindahkan ke tbl gelombang
+tbl gelombang tambahkan field tanggal_mulai perkuliahan
+di form tambah rincian biaya pada dropdown gelombang label format menjadi "tahun_akademik-gelombang"
+pelacahan mahasiswa sekarang semester berapa
+penagihan manual seperti siup
+penambahan item pada spesifik / banyak mahasiswa

@@ -2,17 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\KampusGelombang;
 use App\KampusTahunAkademik;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
-class KampusGelombangController extends Controller
+class KampusTahunAkademikController extends Controller
 {
-    public function __construct()
-    {
-    }
     /**
      * Display a listing of the resource.
      *
@@ -20,7 +16,7 @@ class KampusGelombangController extends Controller
      */
     public function index()
     {
-        return view('kampus.gelombang.index', ['gelombangs' => KampusGelombang::with('tahun_akademik')->whereKampus(Session::get('id_kampus'))->simplePaginate(5)]);
+        return view('kampus.tahun_akademik.index',["tahun_akademiks"=>KampusTahunAkademik::whereKampus(Session::get('id_kampus'))->simplePaginate(5)]);
     }
 
     /**
@@ -30,7 +26,7 @@ class KampusGelombangController extends Controller
      */
     public function create()
     {
-        return view('kampus.gelombang.create',["tahun_akademiks"=>KampusTahunAkademik::whereKampus(Session::get('id_kampus'))->get()]);
+        return view('kampus.tahun_akademik.create');
     }
 
     /**
@@ -43,23 +39,17 @@ class KampusGelombangController extends Controller
     {
         $validator = Validator::make(
             $request->only([
-                'nama_gelombang',
-                'tahun_akademik',
-                'tanggal_mulai',
-                'tanggal_akhir'
+                'nama',
+                'tanggal_ajaran_baru'
             ]),
             [
-                'nama_gelombang' => ['required','unique:kampus_data_gelombang,nama_gelombang'],
-                'tahun_akademik' => ['required'],
-                'tanggal_mulai' => ['required', 'date'],
-                'tanggal_akhir' => ['required', 'date'],
+                'nama' => ['required'],
+                'tanggal_ajaran_baru' => ['required']
             ],
             [],
             [
-                'nama_gelombang' => 'Nama Gelombang',
-                'tahun_akademik' => 'Tahun Akademik',
-                'tanggal_mulai' => 'Tanggal Mulai',
-                'tanggal_akhir' => 'Tanggal Akhir',
+                'nama' => 'Nama Tahun Akademik',
+                'tanggal_ajaran_baru' => 'Tanggal Ajaran Baru'
             ]
         );
 
@@ -75,15 +65,13 @@ class KampusGelombangController extends Controller
                 ->withInput();
         }
 
-        $kampusGelombang = new KampusGelombang();
-        $kampusGelombang->id_kampus = Session::get('id_kampus');
-        $kampusGelombang->id_tahun_akademik = $request->tahun_akademik;
-        $kampusGelombang->nama_gelombang = $request->nama_gelombang;
-        $kampusGelombang->tanggal_mulai = $request->tanggal_mulai;
-        $kampusGelombang->tanggal_akhir = $request->tanggal_akhir;
-        $kampusGelombang->save();
+        $kampus_tahun_akademik = new KampusTahunAkademik();
+        $kampus_tahun_akademik->id_kampus = Session::get('id_kampus');
+        $kampus_tahun_akademik->nama = $request->nama;
+        $kampus_tahun_akademik->tanggal_ajaran_baru = $request->tanggal_ajaran_baru;
+        $kampus_tahun_akademik->save();
 
-        return redirect(route('kampus.gelombang.index'))
+        return redirect(route('kampus.tahun_akademik.index'))
             ->with('flash_message', (object)[
                 'type' => 'success',
                 'title' => 'Sukses',
@@ -94,10 +82,10 @@ class KampusGelombangController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\KampusGelombang  $kampusGelombang
+     * @param  \App\KampusTahunAkademik  $kampus_tahun_akademik
      * @return \Illuminate\Http\Response
      */
-    public function show(KampusGelombang $kampusGelombang)
+    public function show(KampusTahunAkademik $kampus_tahun_akademik)
     {
         abort(404);
     }
@@ -105,45 +93,36 @@ class KampusGelombangController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\KampusGelombang  $kampusGelombang
+     * @param  \App\KampusTahunAkademik  $kampus_tahun_akademik
      * @return \Illuminate\Http\Response
      */
-    public function edit(KampusGelombang $kampusGelombang)
+    public function edit(KampusTahunAkademik $kampus_tahun_akademik)
     {
-        return view('kampus.gelombang.edit', [
-            'gelombang' => $kampusGelombang,
-            'tahun_akademiks'=> KampusTahunAkademik::whereKampus(Session::get('id_kampus'))->get()
-        ]);
+        return view('kampus.tahun_akademik.edit',["tahun_akademik"=>$kampus_tahun_akademik]);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\KampusGelombang  $kampusGelombang
+     * @param  \App\KampusTahunAkademik  $kampus_tahun_akademik
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, KampusGelombang $kampusGelombang)
+    public function update(Request $request, KampusTahunAkademik $kampus_tahun_akademik)
     {
         $validator = Validator::make(
             $request->only([
-                'nama_gelombang',
-                'tahun_akademik',
-                'tanggal_mulai',
-                'tanggal_akhir'
+                'nama',
+                'tanggal_ajaran_baru'
             ]),
             [
-                'nama_gelombang' => ['required','unique:kampus_data_gelombang,nama_gelombang'],
-                'tahun_akademik' => ['required'],
-                'tanggal_mulai' => ['required', 'date'],
-                'tanggal_akhir' => ['required', 'date'],
+                'nama' => ['required'],
+                'tanggal_ajaran_baru' => ['required']
             ],
             [],
             [
-                'nama_gelombang' => 'Nama Gelombang',
-                'tahun_akademik' => 'Tahun Akademik',
-                'tanggal_mulai' => 'Tanggal Mulai',
-                'tanggal_akhir' => 'Tanggal Akhir',
+                'nama' => 'Nama Tahun Akademik',
+                'tanggal_ajaran_baru' => 'Tanggal Ajaran Baru'
             ]
         );
 
@@ -159,25 +138,22 @@ class KampusGelombangController extends Controller
                 ->withInput();
         }
 
-        $kampusGelombang->id_kampus = Session::get('id_kampus');
-        $kampusGelombang->id_tahun_akademik = $request->tahun_akademik;
-        $kampusGelombang->nama_gelombang = $request->nama_gelombang;
-        $kampusGelombang->tanggal_mulai = $request->tanggal_mulai;
-        $kampusGelombang->tanggal_akhir = $request->tanggal_akhir;
+        $kampus_tahun_akademik->id_kampus = Session::get('id_kampus');
+        $kampus_tahun_akademik->nama = $request->nama;
+        $kampus_tahun_akademik->tanggal_ajaran_baru = $request->tanggal_ajaran_baru;
 
-        if (!$kampusGelombang->getDirty()) {
+        if (!$kampus_tahun_akademik->getDirty()) {
             return redirect()
-                ->route('kampus.gelombang.index')
+                ->route('kampus.tahun_akademik.index')
                 ->with('flash_message', (object)[
                     'type' => 'warning',
                     'title' => 'Peringatan',
                     'message' => 'Perubahan Dibatalkan karena tidak ada perubahan'
                 ]);
         }
+        $kampus_tahun_akademik->save();
 
-        $kampusGelombang->save();
-
-        return redirect(route('kampus.gelombang.index'))
+        return redirect(route('kampus.tahun_akademik.index'))
             ->with('flash_message', (object)[
                 'type' => 'success',
                 'title' => 'Sukses',
@@ -188,13 +164,13 @@ class KampusGelombangController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\KampusGelombang  $kampusGelombang
+     * @param  \App\KampusTahunAkademik  $kampus_tahun_akademik
      * @return \Illuminate\Http\Response
      */
-    public function destroy(KampusGelombang $kampusGelombang)
+    public function destroy(KampusTahunAkademik $kampus_tahun_akademik)
     {
-        if (!$kampusGelombang->delete()) {
-            return redirect(route('kampus.gelombang.index'))
+        if (!$kampus_tahun_akademik->delete()) {
+            return redirect(route('kampus.tahun_akademik.index'))
                 ->with('flash_message', (object)[
                     'type' => 'danger',
                     'title' => 'Terjadi Kesalahan',
@@ -202,7 +178,7 @@ class KampusGelombangController extends Controller
                 ]);
         }
 
-        return redirect(route('kampus.gelombang.index'))
+        return redirect(route('kampus.tahun_akademik.index'))
             ->with('flash_message', (object)[
                 'type' => 'success',
                 'title' => 'Sukses',

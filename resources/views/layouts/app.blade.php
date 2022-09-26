@@ -210,6 +210,11 @@
                         </a>
                     </li>
                     <li>
+                        <a href="{{ route('kampus.tahun_akademik.index') }}" class="nav-link {{ request()->routeIs('kampus.tahun_akademik.*') ? 'active' : 'link-dark' }}">
+                            Tahun Akademik
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{ route('kampus.item.index') }}" class="nav-link {{ request()->routeIs('kampus.item.*') ? 'active' : 'link-dark' }}">
                             Komponen Biaya
                         </a>
@@ -230,6 +235,11 @@
                         </a>
                     </li>
                     <li>
+                        <a href="{{ route('kampus.lulusan.index') }}" class="nav-link {{ request()->routeIs('kampus.lulusan.*') ? 'active' : 'link-dark' }}">
+                            Lulusan
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{ route('kampus.gelombang.index') }}" class="nav-link {{ request()->routeIs('kampus.gelombang.*') ? 'active' : 'link-dark' }}">
                             Gelombang
                         </a>
@@ -240,18 +250,28 @@
                         </a>
                     </li>
                     <li>
+                        <a href="{{ route('kampus.pembayaran.index') }}" class="nav-link {{ request()->routeIs('kampus.pembayaran.*') ? 'active' : 'link-dark' }}">
+                            Metode Pembayaran
+                        </a>
+                    </li>
+                </ul>
+                <div class="position-relative d-flex align-items-center mt-4 mb-1">
+                    <hr class="w-100" />
+                </div>
+                <ul class="nav nav-pills flex-column mb-auto px-3">
+                    <li>
                         <a href="{{ route('kampus.mahasiswa.index') }}" class="nav-link {{ request()->routeIs('kampus.mahasiswa.*') ? 'active' : 'link-dark' }}">
                             Mahasiswa
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('kampus.pembayaran.index') }}" class="nav-link {{ request()->routeIs('kampus.pembayaran.*') ? 'active' : 'link-dark' }}">
-                            Metode Pembayaran
+                        <a href="{{ route('kampus.tagihan.index') }}" class="nav-link {{ request()->routeIs('kampus.tagihan.*') ? 'active' : 'link-dark' }}">
+                            Tagihan
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('kampus.jadwal_ulang.index') }}" class="nav-link {{ request()->routeIs('kampus.jadwal_ulang.*') ? 'active' : 'link-dark' }}">
-                            Jadwal Ulang Tagihan
+                            Jadwal Ulang Tagihan <small class="badge bg-danger">(maintenance)</small>
                         </a>
                     </li>
                 </ul>

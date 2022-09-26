@@ -9,6 +9,18 @@
             <div class="card-body">
                 @csrf
                 <div class="mb-3">
+                    <label for="tahun_akademik" class="form-label">
+                        Tahun Akademik
+                    </label>
+                    <select class="form-select @error('tahun_akademik') is-invalid @enderror" id="tahun_akademik" name="tahun_akademik" id="tahun_akademik">
+                        <option value="">Pilih Tahun Akademik</option>
+                        @foreach ($tahun_akademiks as $tahun_akademik)
+                            <option value="{{ $tahun_akademik->id }}" {{ old('tahun_akademik')==$tahun_akademik->id? "selected":"" }}>{{ ucwords($tahun_akademik->nama) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="mb-3">
                     <label for="nama_gelombang" class="form-label">Nama Gelombang</label>
                     <input type="text" name="nama_gelombang" value="{{ old('nama_gelombang') }}" class="form-control @error('nama_gelombang') is-invalid @enderror" id="nama_gelombang" aria-describedby="nama_gelombang" />
                     @error('nama_gelombang')

@@ -4,16 +4,22 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class KampusGelombang extends Model
+class KampusTahunAkademik extends Model
 {
-    protected $table = 'kampus_data_gelombang';
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'kampus_tahun_akademik';
+
     /**
      * Indicates if the model should be timestamped.
      *
      * @var bool
      */
     public $timestamps = false;
-
+    
     public function scopeWhereKampus($query,$id_kampus)
     {
         if(gettype($id_kampus)=="array"){
@@ -23,13 +29,8 @@ class KampusGelombang extends Model
             return $query->where('id_kampus',$id_kampus);
         }
     }
-    
-    public function item_bayar()
+    public function gelombang()
     {
-        return $this->belongsTo(KampusItemBayar::class,'id_data_gelombang','id');
-    }
-    public function tahun_akademik()
-    {
-        return $this->hasOne(KampusTahunAkademik::class,'id','id_tahun_akademik');
+        return $this->belongsTo(KampusGelombang::class,'id_tahun_akademik','id');
     }
 }
