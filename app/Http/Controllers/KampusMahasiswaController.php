@@ -46,7 +46,7 @@ class KampusMahasiswaController extends Controller //generate pertama kali hanya
     public function create()
     {
         return view('kampus.mahasiswa.create', [
-            'prodis' => KampusProdi::all(['id', 'kode_prodi', 'nama']),
+            'prodis' => KampusProdi::with('jenjang')->get(),
             'kelass' => KampusKelas::whereKampus(Session::get('id_kampus'))->get(),
             'metode_belajars' => KampusMetodeBelajar::whereKampus(Session::get('id_kampus'))->get(),
             'lulusans' => KampusLulusan::whereKampus(Session::get('id_kampus'))->get(),
@@ -240,7 +240,7 @@ class KampusMahasiswaController extends Controller //generate pertama kali hanya
                     $banyak_semester = $banyak_bulan / 6;
                     $tanggal = date('Y-m-d', strtotime($request->tanggal_pembayaran));
 
-                    for ($j = 0; $j < $banyak_semester; $j++) {
+                    // for ($j = 0; $j < $banyak_semester; $j++) {
                         foreach ($data_template_angsuran as $template_angsuran) {
                             array_push($data_kampus_rencana_mahasiswa, [
                                 "id_mahasiswa" => $mahasiswa->id,
@@ -256,7 +256,7 @@ class KampusMahasiswaController extends Controller //generate pertama kali hanya
                             ]);
                             $tanggal = date('Y-m-d', strtotime("+1 month", strtotime($tanggal)));
                         }
-                    }
+                    // }
                 }
             }
 
@@ -318,7 +318,7 @@ class KampusMahasiswaController extends Controller //generate pertama kali hanya
         $kampusMahasiswa->item_bayar_selected = array_map('intval', json_decode($kampusMahasiswa->item_bayar_selected));
         return view('kampus.mahasiswa.edit', [
             'mahasiswa' => $kampusMahasiswa,
-            'prodis' => KampusProdi::all(['id', 'kode_prodi', 'nama']),
+            'prodis' => KampusProdi::with('jenjang')->get(),
             'kelass' => KampusKelas::whereKampus(Session::get('id_kampus'))->get(),
             'metode_belajars' => KampusMetodeBelajar::whereKampus(Session::get('id_kampus'))->get(),
             'lulusans' => KampusLulusan::whereKampus(Session::get('id_kampus'))->get(),
@@ -554,7 +554,7 @@ class KampusMahasiswaController extends Controller //generate pertama kali hanya
                         $banyak_semester = $banyak_bulan / 6;
                         $tanggal = date('Y-m-d', strtotime($tanggal_pembayaran));
     
-                        for ($j = 0; $j < $banyak_semester; $j++) {
+                        // for ($j = 0; $j < $banyak_semester; $j++) {
                             foreach ($data_template_angsuran as $template_angsuran) {
                                 array_push($data_kampus_rencana_mahasiswa, [
                                     "id_mahasiswa" => $mahasiswa->id,
@@ -569,7 +569,7 @@ class KampusMahasiswaController extends Controller //generate pertama kali hanya
                                 ]);
                                 $tanggal = date('Y-m-d', strtotime("+1 month", strtotime($tanggal)));
                             }
-                        }   
+                        // }   
                     }
                 }
                 // dd($data_kampus_rencana_mahasiswa);
@@ -623,7 +623,7 @@ class KampusMahasiswaController extends Controller //generate pertama kali hanya
     public function getData(Request $request){
         Debugbar::disable();
 
-        dd($request->all());
+        // dd($request->all());
         if($request->has('id_prodi') && $request->has('id_kelas') && $request->has('id_metode_belajar') && $request->has('id_lulusan')){
             return response()->json([
                 "status"=>200,
@@ -640,6 +640,7 @@ class KampusMahasiswaController extends Controller //generate pertama kali hanya
                     ->where('id_lulusan', $request->id_lulusan)
                     ->where('jenis','!=','open')
                     ->orderBy('jumlah_angsuran')
+                    ->orderBy('id_item')
                     ->get()
                     ->each(function ($item,$index) {
                         $item->text = $item->jumlah_angsuran."x";

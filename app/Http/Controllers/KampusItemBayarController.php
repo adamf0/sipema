@@ -189,6 +189,8 @@ class KampusItemBayarController extends Controller
                 $kampusItemBayar->id_lulusan        = $request->id_lulusan;
                 $kampusItemBayar->nominal           = $request->nominal;
                 $kampusItemBayar->tahun_akademik    = $request->tahun_akademik;
+                $kampusItemBayar->tanggal_awal      = $request->tanggal_awal;
+                $kampusItemBayar->tanggal_akhir     = $request->tanggal_akhir;
                 $kampusItemBayar->jumlah_angsuran   = $items['angsuran'];
                 $kampusItemBayar->type              = $items['type'];
                 $kampusItemBayar->status            = 1;
@@ -307,6 +309,8 @@ class KampusItemBayarController extends Controller
                 $kampusItemBayar->nominal           = $request->nominal;
                 $kampusItemBayar->jumlah_angsuran   = $request->total_angsuran;
                 $kampusItemBayar->tahun_akademik    = $request->tahun_akademik;
+                $kampusItemBayar->tanggal_awal      = $request->tanggal_awal;
+                $kampusItemBayar->tanggal_akhir     = $request->tanggal_akhir;
                 $kampusItemBayar->template_angsuran = $request->jenis=="open"? "[]":json_encode($_anggaran);
                 // dd($kampusItemBayar);
                 $kampusItemBayar->save();

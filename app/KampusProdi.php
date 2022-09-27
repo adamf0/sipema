@@ -39,4 +39,9 @@ class KampusProdi extends Model
     {
         return $this->belongsTo(KampusItemBayar::class, 'id_kelompok', 'id');
     }
+
+    public function jenjang()
+    {
+        return $this->hasOne(MasterJenjang::class, 'id', 'id_jenjang');
+    }
 }

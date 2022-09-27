@@ -46,7 +46,7 @@
                     <select class="form-select" name="id_prodi" id="id_prodi" required>
                         <option value="">Pilih Prodi</option>
                         @foreach ($prodis as $prodi)
-                            <option value="{{ $prodi->id }}" {{ ($prodi->id==$item_bayar->id_prodi? "selected":"") }}>{{ ucwords($prodi->nama) }} ({{ ucwords($prodi->jenjang) }})</option>
+                            <option value="{{ $prodi->id }}" {{ ($prodi->id==$item_bayar->id_prodi? "selected":"") }}>{{ ucwords($prodi->nama) }} ({{ ucwords($prodi->jenjang->nama) }})</option>
                         @endforeach
                     </select>
                 </div>
@@ -101,6 +101,23 @@
 
                 <input type="hidden" name="jenis" value="{{$item_bayar->jenis}}">
 
+                <div class="mb-3" id="panel-nonbulan" style="display: {{ $item_bayar->jenis!='bulanan'? 'block':'none' }}">
+                    <div class="row">
+                        <div class="col">
+                            <label for="tanggal_awal" class="form-label">
+                                Tanggal Awal
+                            </label>
+                            <input type="date" name="tanggal_awal" class="form-control" id="tanggal_awal" value='{{ $item_bayar->jenis!="bulanan"? $item_bayar->tanggal_awal:"" }}'/>
+                        </div>
+                        <div class="col">
+                            <label for="tanggal_akhir" class="form-label">
+                                Tanggal Akhir
+                            </label>
+                            <input type="date" name="tanggal_akhir" class="form-control" id="tanggal_akhir" value='{{ $item_bayar->jenis!="bulanan"? $item_bayar->tanggal_akhir:"" }}'/>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="mb-3">
                     <label for="nominal" class="form-label">Nominal</label>
                     <input type="text" name="nominal" class="form-control" id="nominal" value="{{ $item_bayar->nominal }}" min="1" required/>

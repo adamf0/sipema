@@ -54,7 +54,7 @@
                     <select name="prodi" id="prodi" class="form-select @error('prodi') is-invalid @enderror">
                         <option value="" {{ $errors->get('prodi') ? '' : 'selected' }}>Pilih Prodi</option>
                         @foreach ($prodis as $prodi)
-                            <option value="{{ $prodi->id }}" {{ old('prodi') == $prodi->id ? 'selected' : '' }}>{{ ucwords($prodi->nama) }}</option>
+                            <option value="{{ $prodi->id }}" {{ old('prodi') == $prodi->id ? 'selected' : '' }}>{{ ucwords($prodi->nama) }} ({{ ucwords($prodi->jenjang->nama) }})</option>
                         @endforeach
                     </select>
                     @error('prodi')

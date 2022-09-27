@@ -12,6 +12,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Lulusan</th>
+                    <th>Prasyarat</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -20,7 +21,7 @@
                     <tr>
                         <th>{{ $lulusan->id }}</th>
                         <td>{{ $lulusan->nama }}</td>
-                        <td>
+                        <td>{{ $lulusan->jenjang->nama }}<td>
                             <div class="d-flex gap-2">
                                 <a href="{{ route('kampus.lulusan.edit', ['kampus_lulusan' => $lulusan->id]) }}" class="btn btn-warning btn-sm">Edit</a>
                                 <form action="{{ route('kampus.lulusan.destroy', ['kampus_lulusan' => $lulusan->id]) }}" method="post">

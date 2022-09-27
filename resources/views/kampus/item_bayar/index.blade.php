@@ -40,7 +40,7 @@
                         <td>{{ $item_bayar->gelombang->nama_gelombang }}</td>
                         <td>
                             {{ $item_bayar->prodi->nama }}<br>
-                            <small>({{ $item_bayar->prodi->jenjang }})</small>
+                            <small>({{ $item_bayar->prodi->jenjang->nama }})</small>
                         </td>
                         <td>{{ $item_bayar->lulusan->nama }}</td>
                         <td>{{ $item_bayar->kelas->nama }}</td>

@@ -43,7 +43,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="mb-3">
-                    <a href="#" class="btn btn-primary mt-4">Tambah</a>
+                    <!-- <a href="#" class="btn btn-primary mt-4">Tambah</a> -->
                 </div>
             </div>
         </div>
