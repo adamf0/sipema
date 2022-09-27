@@ -17,6 +17,18 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
+                <div class="mb-3">
+                    <label for="jenjang" class="form-label">Prasyarat Jenjang</label>
+                    <select name="jenjang" id="jenjang" class="form-select @error('jenjang') is-invalid @enderror">
+                        <option value="" {{ $errors->get('jenjang') ? '' : 'selected' }}>Pilih jenjang</option>
+                        @foreach ($jenjangs as $jenjang)
+                            <option value="{{ $jenjang->id }}" {{ old('jenjang') == $jenjang->id ? 'selected' : '' }}>{{ ucwords($jenjang->nama) }}</option>
+                        @endforeach
+                    </select>
+                    @error('jenjang')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
             </div>
             <div class="card-footer text-muted">
                 <button type="submit" class="btn btn-primary">Simpan</button>

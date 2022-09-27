@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\KampusLulusan;
+use App\MasterJenjang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -16,10 +17,8 @@ class KampusLulusanController extends Controller
      */
     public function index()
     {
-        $kampus_lulusan = KampusLulusan::simplePaginate(5);
-
         return view('kampus.lulusan.index', [
-            'kampusLulusan' => $kampus_lulusan
+            'kampusLulusan' => KampusLulusan::with('jenjang')->simplePaginate(5)
         ]);
     }
 
@@ -30,7 +29,7 @@ class KampusLulusanController extends Controller
      */
     public function create()
     {
-        return view('kampus.lulusan.create');
+        return view('kampus.lulusan.create',['jenjangs'=>MasterJenjang::all()]);
     }
 
     /**
@@ -43,14 +42,17 @@ class KampusLulusanController extends Controller
     {
         $validator = Validator::make(
             $request->only([
-                'nama'
+                'nama',
+                'jenjang'
             ]),
             [
-                'nama' => ['required']
+                'nama' => ['required'],
+                'jenjang' => ['required']
             ],
             [],
             [
-                'nama' => 'Nama Lulusan'
+                'nama' => 'Nama Lulusan',
+                'jenjang' => 'Prasyarat Jenjang'
             ]
         );
 
@@ -69,6 +71,7 @@ class KampusLulusanController extends Controller
         $kampus_lulusan = new KampusLulusan();
         $kampus_lulusan->id_kampus = Session::get('id_kampus');
         $kampus_lulusan->nama = $request->nama;
+        $kampus_lulusan->prasyarat_jenjang = $request->jenjang;
         $kampus_lulusan->save();
 
         return redirect(route('kampus.lulusan.index'))
@@ -98,7 +101,7 @@ class KampusLulusanController extends Controller
      */
     public function edit(KampusLulusan $kampus_lulusan)
     {
-        return view('kampus.lulusan.edit',['lulusan'=>$kampus_lulusan]);
+        return view('kampus.lulusan.edit',['lulusan'=>$kampus_lulusan,"jenjangs"=>MasterJenjang::all()]);
     }
 
     /**
@@ -112,14 +115,17 @@ class KampusLulusanController extends Controller
     {
         $validator = Validator::make(
             $request->only([
-                'nama'
+                'nama',
+                'jenjang'
             ]),
             [
-                'nama' => ['required']
+                'nama' => ['required'],
+                'jenjang' => ['required']
             ],
             [],
             [
-                'nama' => 'Nama Lulusan'
+                'nama' => 'Nama Lulusan',
+                'jenjang' => 'Prasyarat Jenjang'
             ]
         );
 
@@ -137,6 +143,7 @@ class KampusLulusanController extends Controller
 
         $kampus_lulusan->id_kampus = Session::get('id_kampus');
         $kampus_lulusan->nama = $request->nama;
+        $kampus_lulusan->prasyarat_jenjang = $request->jenjang;
 
         if (!$kampus_lulusan->getDirty()) {
             return redirect()
@@ -147,7 +154,6 @@ class KampusLulusanController extends Controller
                     'message' => 'Perubahan Dibatalkan karena tidak ada perubahan'
                 ]);
         }
-
         $kampus_lulusan->save();
 
         return redirect(route('kampus.lulusan.index'))

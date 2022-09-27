@@ -49,7 +49,7 @@
                     <select class="form-select" name="id_prodi" id="id_prodi" required>
                         <option value="">Pilih Prodi</option>
                         @foreach ($prodis as $prodi)
-                            <option value="{{ $prodi->id }}">{{ ucwords($prodi->nama) }} ({{ ucwords($prodi->jenjang) }})</option>
+                            <option value="{{ $prodi->id }}">{{ ucwords($prodi->nama) }} ({{ ucwords($prodi->jenjang->nama) }})</option>
                         @endforeach
                     </select>
                 </div>
@@ -113,6 +113,23 @@
                         <option value="angsuran">Angsuran</option>
                         <option value="open">Open</option>
                     </select>
+                </div>
+
+                <div class="mb-3" id="panel-nonbulan">
+                    <div class="row">
+                        <div class="col">
+                            <label for="tanggal_awal" class="form-label">
+                                Tanggal Awal
+                            </label>
+                            <input type="date" name="tanggal_awal" class="form-control" id="tanggal_awal"/>
+                        </div>
+                        <div class="col">
+                            <label for="tanggal_akhir" class="form-label">
+                                Tanggal Akhir
+                            </label>
+                            <input type="date" name="tanggal_akhir" class="form-control" id="tanggal_akhir"/>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mb-3">
@@ -203,6 +220,9 @@
         var jenis = null; 
         $('#nav-tab').hide();
         $('#nav-tabContent').hide();
+        $('#panel-nonbulan').hide();
+        $('#tanggal_awal').val("");
+        $('#tanggal_akhir').val("");
 
         // function initMaskMoney() {
         //     $('.money').maskMoney({prefix:'Rp ', thousands:'.', decimal:',', affixesStay: true}); 
@@ -272,6 +292,9 @@
         });
         function changeJenisNominal(){
             if(jenis=="bulanan"){
+                $('#panel-nonbulan').hide();
+                $('#tanggal_awal').val("");
+                $('#tanggal_akhir').val("");
                 $('.btn-add').show();
                 if(nominal == 0){
                     $('.btn-gen').prop('disabled', true);
@@ -287,12 +310,14 @@
                 }
             }
             else if(jenis=="insidentil"){
+                $('#panel-nonbulan').show();
                 $('.btn-gen').prop('disabled', true);
                 $('.btn-gen').hide();
                 $('#nav-tab').hide();
                 $('#nav-tabContent').hide();
             }
             else if(jenis=="angsuran"){
+                $('#panel-nonbulan').show();
                 $('.btn-gen').prop('disabled', true);
                 $('#nav-tab').hide();
                 $('.btn-add').hide();
@@ -306,7 +331,8 @@
                 }
             }
             else{
-                $('.btn-gen').prop('disabled', true);
+                $('#panel-nonbulan').show();
+                $('.btn-gen').prop('disabled', false);
                 $('#nav-tab').hide();
                 $('.btn-add').hide();
                 $('.btn-gen').hide();

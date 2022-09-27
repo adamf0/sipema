@@ -42,6 +42,9 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('item-bayar', 'KampusItemBayarController')->parameter('item-bayar', 'kampus_item_bayar');
         Route::resource('pembayaran', 'KampusPembayaranController')->parameter('pambayaran', 'kampus_pembayaran');
         Route::resource('mahasiswa', 'KampusMahasiswaController')->parameter('mahasiswa', 'kampus_mahasiswa');
+        Route::get('mahasiswa/{kampus_mahasiswa}/rencana/create','KampusMahasiswaExtController@create')->name('mahasiswa.rencanan.create');
+        Route::post('mahasiswa/{kampus_mahasiswa}/rencana','KampusMahasiswaExtController@store')->name('mahasiswa.rencanan.store');
+
         Route::resource('tagihan', 'KampusTagihanController')->parameter('tagihan', 'kampus_tagihan');
         Route::post('tagihan', 'KampusTagihanController@index');
         
@@ -78,6 +81,7 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 Route::post('getData', 'KampusMahasiswaController@getData')->name('getData');
+Route::post('getDataItems', 'KampusMahasiswaExtController@getData')->name('getDataItems');
 
 Route::get('tes-transaksi', function(){
         $data_group_mahasiwa = DB::table('kampus_rencana_mahasiswa as krm')
@@ -103,7 +107,7 @@ Route::get('tes-transaksi', function(){
                     ->whereNotNull('krm.tanggal_bayar')
                     ->where('krm.tanggal_bayar',date('Y-m-d')) //date('Y-m-d')
                     ->get();
-        dd($data_group_mahasiwa,$data_mahasiwa);
+        // dd($data_group_mahasiwa,$data_mahasiwa);
 
         DB::transaction(function () use (&$data_group_mahasiwa, &$data_mahasiwa) {
             foreach ($data_group_mahasiwa as $dgm) {

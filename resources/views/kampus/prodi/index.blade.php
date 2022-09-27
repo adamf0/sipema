@@ -24,7 +24,7 @@
                         <th>{{ $prodi->id }}</th>
                         <td>{{ $prodi->kode_prodi }}</td>
                         <td>{{ $prodi->nama }}</td>
-                        <td>{{ $prodi->jenjang }}</td>
+                        <td>{{ $prodi->jenjang->nama }}</td>
                         <td>{{ $prodi->masa_studi }} Tahun</td>
                         <td>
                             <div class="d-flex gap-2">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\KampusProdi;
+use App\MasterJenjang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -21,7 +22,7 @@ class KampusProdiController extends Controller
      */
     public function index()
     {
-        $prodis = KampusProdi::whereKampus(Session::get('id_kampus'))->simplePaginate(5);
+        $prodis = KampusProdi::with('jenjang')->whereKampus(Session::get('id_kampus'))->simplePaginate(5);
 
         return view('kampus.prodi.index', ['prodis' => $prodis]);
     }
@@ -33,7 +34,7 @@ class KampusProdiController extends Controller
      */
     public function create()
     {
-        return view('kampus.prodi.create');
+        return view('kampus.prodi.create',["jenjangs"=>MasterJenjang::all()]);
     }
 
     /**
@@ -82,7 +83,7 @@ class KampusProdiController extends Controller
         $kampusProdi->id_kampus = Session::get('id_kampus');
         $kampusProdi->kode_prodi = $request->kode_prodi;
         $kampusProdi->nama = $request->nama;
-        $kampusProdi->jenjang = $request->jenjang;
+        $kampusProdi->id_jenjang = $request->jenjang;
         $kampusProdi->masa_studi = $request->masa_studi;
         $kampusProdi->save();
 
@@ -114,7 +115,8 @@ class KampusProdiController extends Controller
     public function edit(KampusProdi $kampusProdi)
     {
         return view('kampus.prodi.edit', [
-            'prodi' => $kampusProdi
+            'prodi' => $kampusProdi,
+            'jenjangs'=>MasterJenjang::all()
         ]);
     }
 
@@ -164,7 +166,7 @@ class KampusProdiController extends Controller
         $kampusProdi->id_kampus = Session::get('id_kampus');
         $kampusProdi->kode_prodi = $request->kode_prodi;
         $kampusProdi->nama = $request->nama;
-        $kampusProdi->jenjang = $request->jenjang;
+        $kampusProdi->id_jenjang = $request->jenjang;
         $kampusProdi->masa_studi = $request->masa_studi;
 
         if (!$kampusProdi->getDirty()) {
