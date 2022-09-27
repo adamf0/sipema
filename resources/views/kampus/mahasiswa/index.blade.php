@@ -3,8 +3,9 @@
 @section('page-title', 'Mahasiswa')
 
 @section('content')
-    <div class="d-flex justify-content-between mb-2">
+    <div class="d-flex mb-2">
         <a href="{{ route('kampus.mahasiswa.create') }}" class="btn btn-primary">Tambah</a>
+        <a href="{{ route('kampus.mahasiswa.rencana.create') }}" class="btn btn-secondary mx-2">Tambah Rincian Pembayaran</a>
     </div>
     <div class="w-100 overflow-auto">
         <table class="table table-responsive table-bordered">
@@ -17,6 +18,9 @@
                     <th>Tanggal Lahir</th>
                     <th>Jenis Kelamin</th>
                     <th>Prodi</th>
+                    <th>Kelas</th>
+                    <th>Metode Belajar</th>
+                    <th>Lulusan</th>
                     <th>Tanggal Pembayaran</th>
                     <th>No. MOU</th>
                     <th>Aksi</th>
@@ -37,12 +41,17 @@
                                 Perempuan
                             @endif
                         </td>
-                        <td>{{ $mahasiswa->prodi->nama }}</td>
+                        <td>
+                            {{ $mahasiswa->prodi->nama }}
+                            ({{ $mahasiswa->prodi->jenjang->nama }})
+                        </td>
+                        <td>{{ $mahasiswa->kelas->nama }}</td>
+                        <td>{{ $mahasiswa->metode_belajar->nama }}</td>
+                        <td>{{ $mahasiswa->lulusan->nama }}</td>
                         <td>{{ $mahasiswa->tanggal_pembayaran }}</td>
                         <td>{{ $mahasiswa->kampusMou->no_mou ?? 'Tidak Ditemukan' }}</td>
                         <td>
                             <div class="d-flex gap-2">
-                                <a href="#" class="btn btn-secondary btn-sm">Tagihan</a>
                                 <a href="{{ route('kampus.mahasiswa.show', ['mahasiswa' => $mahasiswa->id]) }}" class="btn btn-primary btn-sm">Rencana</a>
                                 <a href="{{ route('kampus.mahasiswa.edit', ['mahasiswa' => $mahasiswa->id]) }}" class="btn btn-warning btn-sm">Edit</a>
                                 <form action="{{ route('kampus.mahasiswa.destroy', ['mahasiswa' => $mahasiswa->id]) }}" method="post">

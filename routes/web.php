@@ -42,8 +42,9 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('item-bayar', 'KampusItemBayarController')->parameter('item-bayar', 'kampus_item_bayar');
         Route::resource('pembayaran', 'KampusPembayaranController')->parameter('pambayaran', 'kampus_pembayaran');
         Route::resource('mahasiswa', 'KampusMahasiswaController')->parameter('mahasiswa', 'kampus_mahasiswa');
-        Route::get('mahasiswa/{kampus_mahasiswa}/rencana/create','KampusMahasiswaExtController@create')->name('mahasiswa.rencanan.create');
-        Route::post('mahasiswa/{kampus_mahasiswa}/rencana','KampusMahasiswaExtController@store')->name('mahasiswa.rencanan.store');
+        Route::get('mahasiswa/rencana/create','KampusMahasiswaExtController@create')->name('mahasiswa.rencana.create');
+        Route::post('mahasiswa/rencana','KampusMahasiswaExtController@store')->name('mahasiswa.rencana.store');
+        Route::post('mahasiswa/rencana/destroy','KampusMahasiswaExtController@destroy')->name('mahasiswa.rencana.destroy');
 
         Route::resource('tagihan', 'KampusTagihanController')->parameter('tagihan', 'kampus_tagihan');
         Route::post('tagihan', 'KampusTagihanController@index');

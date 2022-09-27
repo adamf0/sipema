@@ -27,4 +27,8 @@ class KampusLulusan extends Model
     {
         return $this->hasOne(MasterJenjang::class, 'id', 'prasyarat_jenjang');
     }
+    public function mahasiswa()
+    {
+        return $this->belongsTo(KampusMahasiswa::class, 'id_lulusan', 'id');
+    }
 }

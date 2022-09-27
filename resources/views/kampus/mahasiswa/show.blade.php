@@ -3,11 +3,12 @@
 @section('page-title', 'Rencana Pembayaran Mahasiswa : ' . $mahasiswa->nama_lengkap)
 
 @push('js')
-    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
     <script src="https://www.jqueryscript.net/demo/Merge-Cells-HTML-Table/jquery.table.marge.js"></script>
-    <script src="{{ asset('js/jquery.redirect.js') }}" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+    <script src="{{ asset('js/jquery.redirect.js') }}"></script>
     <script>
         let id_rencana_mahasiswa = [];
+        let mahasiswa = {{ $mahasiswa->id }};
 
         function disabledClass(element,disabled){
             if(!disabled){
@@ -67,15 +68,15 @@
             disabledClass($('.btn-hapus'),id_rencana_mahasiswa.length==0);
             console.log(id_rencana_mahasiswa);
         });
-
-        //$.redirect("", data, 'POST');
+        $('.btn-hapus').click(function() {
+            $.redirect("{{ route('kampus.mahasiswa.rencana.destroy') }}", {'id_rencana_mahasiswa':id_rencana_mahasiswa,'id_mahasiswa':mahasiswa}, 'POST');
+        });
     </script>
 @endpush
 
 @section('content')
 <div class="row">
     <div class="col-md-12 mb-3">
-        <a href="#" class="btn btn-primary">Tambah Rincian Pembayaran</a>
         <a href="#" class="btn btn-warning">Reschedule</a>
         <a href="#" class="btn btn-danger btn-hapus disabled">Hapus</a>
     </div>
@@ -153,7 +154,7 @@
                         <tbody>
                             @foreach ($non_bulanans as $index => $item)
                                 <tr>
-                                    <td><input type="checkbox" name="id_rencana_mahasiswa[]" value="{{ $rencana->id }}" class="rencana_nonbulan"></td>
+                                    <td><input type="checkbox" name="id_rencana_mahasiswa[]" value="{{ $item->id }}" class="rencana_nonbulan"></td>
                                     <td>{{ $item->item_bayar->item->nama }}</td>
                                     <td>{{ "Rp ".number_format($item->biaya, 0, ",", ".") }}</td>
                                     <td>{{ $item->nama }}</td>

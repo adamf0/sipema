@@ -23,4 +23,8 @@ class KampusMetodeBelajar extends Model
     {
         return $this->belongsTo(KampusItemBayar::class, 'id_metode_belajar', 'id');
     }
+    public function mahasiswa()
+    {
+        return $this->belongsTo(KampusMahasiswa::class, 'id_metode_belajar', 'id');
+    }
 }
