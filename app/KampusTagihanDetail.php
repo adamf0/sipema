@@ -11,7 +11,7 @@ class KampusTagihanDetail extends Model
 
     public function tagihan()
     {
-        return $this->belongsTo(KampusTagihan::class, 'id', 'id_transaksi');//belongsTo
+        return $this->belongsTo(KampusTagihan::class, 'id_transaksi', 'id'); //belongsTo
     }
     public function rencana()
     {

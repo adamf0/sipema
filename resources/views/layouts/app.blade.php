@@ -51,12 +51,12 @@
                     @else
                         @role('User')
                             <li class="nav-item {{ count(Auth::user()->user_kampus) > 0 ? 'dropdown' : '' }}">
-                                <a class="nav-link {{ count(Auth::user()->user_kampus) > 0 ? 'dropdown-toggle' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ Session::get('nama_kampus') }}</a>
+                                <a class="nav-link text-wrap {{ count(Auth::user()->user_kampus) > 0 ? 'dropdown-toggle' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ Session::get('nama_kampus') }}</a>
                                 @if (count(Auth::user()->user_kampus) > 0)
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <li>
                                             @foreach (Auth::user()->user_kampus as $kampus)
-                                                <a class="dropdown-item" href="{{ route('kampus.switch', ['id_kampus' => $kampus->id_kampus, 'to' => base64_encode(Route::currentRouteName())]) }}">{{ $kampus->kampus->nama_kampus }}</a>
+                                                <a class="dropdown-item text-wrap" href="{{ route('kampus.switch', ['id_kampus' => $kampus->id_kampus, 'to' => base64_encode(Route::currentRouteName())]) }}">{{ $kampus->kampus->nama_kampus }}</a>
                                             @endforeach
                                         </li>
                                     </ul>
@@ -65,7 +65,7 @@
                         @endrole
 
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ Auth::user()->name }}</a>
+                            <a class="nav-link dropdown-toggle text-wrap" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ Auth::user()->name }}</a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li class="dropdown-item-text">
                                     <div>Login Sebagai : </div>
@@ -252,6 +252,11 @@
                     <li>
                         <a href="{{ route('kampus.jadwal_ulang.index') }}" class="nav-link {{ request()->routeIs('kampus.jadwal_ulang.*') ? 'active' : 'link-dark' }}">
                             Jadwal Ulang Tagihan
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('kampus.pelaporan.index') }}" class="nav-link {{ request()->routeIs('kampus.pelaporan.*') ? 'active' : 'link-dark' }}">
+                            Pelaporan
                         </a>
                     </li>
                 </ul>

@@ -51,6 +51,7 @@ Route::middleware(['auth'])->group(function () {
                 }
             }
         })->name('switch');
+        Route::resource('pelaporan', 'KampusPelaporanController')->except('create', 'update', 'delete');
     });
 
     Route::resource('biaya-potongan', 'BiayaPotonganController')->parameter('biaya_potong', 'biaya_potongan');
