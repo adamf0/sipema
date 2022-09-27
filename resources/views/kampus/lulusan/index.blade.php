@@ -1,35 +1,29 @@
 @extends('layouts.app')
 
-@section('page-title', 'gelombang')
+@section('page-title', 'Lulusan')
 
 @section('content')
     <div class="d-flex justify-content-between mb-2">
-        <a href="{{ route('kampus.gelombang.create') }}" class="btn btn-primary">Tambah</a>
+        <a href="{{ route('kampus.lulusan.create') }}" class="btn btn-primary">Tambah</a>
     </div>
     <div class="w-100 overflow-auto">
         <table class="table table-responsive table-bordered">
             <thead class="table-light">
                 <tr>
                     <th>ID</th>
-                    <th>Tahun Akademik</th>
-                    <th>Nama Gelombang</th>
-                    <th>Tanggal Mulai</th>
-                    <th>Tanggal Akhir</th>
+                    <th>Lulusan</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse ($gelombangs as $gelombang)
+                @forelse ($kampusLulusan as $lulusan)
                     <tr>
-                        <th>{{ $gelombang->id }}</th>
-                        <td>{{ $gelombang->tahun_akademik->nama }}</td>
-                        <td>{{ $gelombang->nama_gelombang }}</td>
-                        <td>{{ \Carbon\Carbon::parse($gelombang->tanggal_mulai)->format('d F Y') }}</td>
-                        <td>{{ \Carbon\Carbon::parse($gelombang->tanggal_akhir)->format('d F Y') }}</td>
+                        <th>{{ $lulusan->id }}</th>
+                        <td>{{ $lulusan->nama }}</td>
                         <td>
                             <div class="d-flex gap-2">
-                                <a href="{{ route('kampus.gelombang.edit', ['gelombang' => $gelombang->id]) }}" class="btn btn-warning btn-sm">Edit</a>
-                                <form action="{{ route('kampus.gelombang.destroy', ['gelombang' => $gelombang->id]) }}" method="post">
+                                <a href="{{ route('kampus.lulusan.edit', ['kampus_lulusan' => $lulusan->id]) }}" class="btn btn-warning btn-sm">Edit</a>
+                                <form action="{{ route('kampus.lulusan.destroy', ['kampus_lulusan' => $lulusan->id]) }}" method="post">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
@@ -48,6 +42,6 @@
         </table>
     </div>
     <div class="d-flex justify-content-center">
-        {{ $gelombangs->links() }}
+        {{ $kampusLulusan->links() }}
     </div>
 @endsection

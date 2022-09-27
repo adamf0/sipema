@@ -24,7 +24,7 @@
                     <th>Tahun Akademik</th>
                     <th>Gelombang</th>
                     <th>Prodi</th>
-                    <th>Jenjang</th>
+                    <th>Lulusan</th>
                     <th>Kelas</th>
                     <th>Metode Belajar</th>
                     <th>Komponen Biaya</th>
@@ -36,10 +36,13 @@
             <tbody>
                 @foreach ($item_bayars as $index => $item_bayar)
                     <tr>
-                        <td>{{ $item_bayar->tahun_akademik }}</td>
+                        <td>{{ $item_bayar->gelombang->tahun_akademik->nama }}</td>
                         <td>{{ $item_bayar->gelombang->nama_gelombang }}</td>
-                        <td>{{ $item_bayar->prodi->nama }}</td>
-                        <td>{{ $item_bayar->prodi->jenjang }}</td>
+                        <td>
+                            {{ $item_bayar->prodi->nama }}<br>
+                            <small>({{ $item_bayar->prodi->jenjang }})</small>
+                        </td>
+                        <td>{{ $item_bayar->lulusan->nama }}</td>
                         <td>{{ $item_bayar->kelas->nama }}</td>
                         <td>{{ $item_bayar->metode_belajar->nama }}</td>
                         <td>

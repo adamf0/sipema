@@ -73,14 +73,14 @@
                             @forelse ($tagihans as $tagihan)
                                 @foreach ($tagihan->tagihan_detail as $index => $detail)
                                     <tr>
-                                        @if ($tagihan->tagihan_detail->count()>1 && $index==0)
+                                        @if ($tagihan->tagihan_detail->count()>=1 && $index==0)
                                         <td rowspan="{{ $tagihan->tagihan_detail->count() }}"><input type="checkbox" name="id_tagihan[]" value="{{$tagihan->id}}" {{ in_array($tagihan->id,$jadwal_ulang->item_tagihan_selected)? 'checked' : '' }} {{ ($tagihan->status==1)? "disabled":"" }}></td>
                                         <td rowspan="{{ $tagihan->tagihan_detail->count() }}">{{$tagihan->nomor_transaksi}}</td>
                                         <td rowspan="{{ $tagihan->tagihan_detail->count() }}">{{ \Carbon\Carbon::parse($tagihan->tanggal)->format('j F Y') }}</td>
                                         @endif                                        
                                         <td>{{ $detail->rencana->item_bayar->item->nama }}</td>
                                         <td>{{ "Rp ".number_format($detail->biaya, 0, ",", ".") }}</td>
-                                        @if ($tagihan->tagihan_detail->count()>1 && $index==0)
+                                        @if ($tagihan->tagihan_detail->count()>=1 && $index==0)
                                         <td rowspan="{{ $tagihan->tagihan_detail->count() }}">{{ "Rp ".number_format(array_sum( $tagihan->tagihan_detail->pluck('biaya')->toArray() ), 0, ",", ".") }}</td>
                                         <td rowspan="{{ $tagihan->tagihan_detail->count() }}">
                                             @switch($tagihan->status)

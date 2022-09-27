@@ -3,19 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\KampusItemBayar;
+use App\KampusKelas;
+use App\KampusLulusan;
 use App\KampusMahasiswa;
+use App\KampusMetodeBelajar;
 use App\KampusMou;
 use App\KampusProdi;
 use App\KampusRencanaMahasiswa;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Debugbar;
 
-class KampusMahasiswaController extends Controller
+class KampusMahasiswaController extends Controller //generate pertama kali hanya 1 semester, nanti untuk semester selanjutnya dibuat manual
 {
     public function __construct()
     {
@@ -42,24 +45,23 @@ class KampusMahasiswaController extends Controller
      */
     public function create()
     {
-        $prodis = KampusProdi::all(['id', 'kode_prodi', 'nama']);
-        $itemBayars = KampusItemBayar::with(['gelombang', 'item'])
-            ->whereKampus(Session::get('id_kampus'))
-            ->where('status', 1)
-            ->get()
-            ->filter(function ($item) {
-                if (Carbon::parse(date('Y-m-d'))->between($item->gelombang->tanggal_mulai, $item->gelombang->tanggal_akhir) && $item->jenis != "open") {
-                    return $item;
-                }
-            })
-            ->values()
-            ->groupBy(['id_item'])
-            ->values();
-        // dd($itemBayars);
-
         return view('kampus.mahasiswa.create', [
-            'prodis' => $prodis,
-            'itemBayars' => $itemBayars
+            'prodis' => KampusProdi::all(['id', 'kode_prodi', 'nama']),
+            'kelass' => KampusKelas::whereKampus(Session::get('id_kampus'))->get(),
+            'metode_belajars' => KampusMetodeBelajar::whereKampus(Session::get('id_kampus'))->get(),
+            'lulusans' => KampusLulusan::whereKampus(Session::get('id_kampus'))->get(),
+            'items' => KampusItemBayar::with('item')
+                        ->whereHas('gelombang',function($q){
+                            return $q->where('tanggal_mulai','>=',"2022-09-05")
+                                    ->where('tanggal_akhir','>=',"2022-09-05");
+                        })
+                        ->whereKampus(Session::get('id_kampus'))
+                        ->where('status', 1)
+                        ->where('jenis','!=','open')
+                        ->orderBy('id_item')
+                        ->get()
+                        ->unique('id_item')
+                        ->pluck('item.nama'),
         ]);
     }
 
@@ -182,6 +184,9 @@ class KampusMahasiswaController extends Controller
         $mahasiswa->tanggal_lahir = $request->tanggal_lahir;
         $mahasiswa->jenis_kelamin = $request->jenis_kelamin;
         $mahasiswa->id_prodi = $request->prodi;
+        $mahasiswa->id_kelas = $request->kelas;
+        $mahasiswa->id_lulusan = $request->lulusan;
+        $mahasiswa->id_metode_belajar = $request->metode_belajar;
         $mahasiswa->tanggal_pembayaran = $request->tanggal_pembayaran;
         $mahasiswa->id_mou = $mou->id;
         $mahasiswa->item_bayar_selected = json_encode($request->item_bayar_selected);
@@ -276,13 +281,30 @@ class KampusMahasiswaController extends Controller
      */
     public function show(KampusMahasiswa $kampusMahasiswa)
     {
-        $rencanas = KampusRencanaMahasiswa::with('item_bayar.item','tagihan_detail.tagihan')
+        $max_cicilan  =  KampusItemBayar::whereIn('id',json_decode($kampusMahasiswa->item_bayar_selected))
+                            ->where('jenis',"bulanan")
+                            ->first();
+
+        $data_bulanan = KampusRencanaMahasiswa::with('item_bayar.item','tagihan_detail.tagihan')
                         ->where('id_mahasiswa',$kampusMahasiswa->id)
+                        ->where('jenis',"bulanan")
                         ->orderBy('tanggal_bayar','ASC')
                         ->get()
                         ->groupBy('tanggal_bayar');
-        // dd($rencanas[0]);
-        return view('kampus.mahasiswa.show', ['mahasiswa' => $kampusMahasiswa,'rencanas'=>$rencanas]);
+
+        $data_nonbulan = KampusRencanaMahasiswa::with('item_bayar.item','tagihan_detail.tagihan')
+                        ->where('id_mahasiswa',$kampusMahasiswa->id)
+                        ->where('jenis','!=',"bulanan")
+                        ->orderBy('tanggal_bayar','ASC')
+                        ->get();
+
+        // dd($data_bulanan,$data_nonbulan,$max_cicilan);
+        return view('kampus.mahasiswa.show', [
+            'mahasiswa' => $kampusMahasiswa,
+            'bulanans'=>$data_bulanan,
+            'non_bulanans'=>$data_nonbulan,
+            'max_cicilan'=>$max_cicilan->jumlah_angsuran ?? 1
+        ]);
     }
 
     /**
@@ -293,44 +315,25 @@ class KampusMahasiswaController extends Controller
      */
     public function edit(KampusMahasiswa $kampusMahasiswa) //bug list item bayar
     {
-        $itemOpens = KampusItemBayar::with(['gelombang', 'item'])
-            ->whereKampus(Session::get('id_kampus'))
-            ->where('status', 1)
-            ->get()
-            ->filter(function ($item) {
-                if (Carbon::parse(date('Y-m-d'))->between($item->gelombang->tanggal_mulai, $item->gelombang->tanggal_akhir) && $item->jenis == "open") {
-                    return $item;
-                }
-            })
-            ->values()
-            ->pluck('id')
-            ->toArray(); 
-            
         $kampusMahasiswa->item_bayar_selected = array_map('intval', json_decode($kampusMahasiswa->item_bayar_selected));
-        $kampusMahasiswa->item_bayar_selected = array_filter($kampusMahasiswa->item_bayar_selected, function ($item) use(&$itemOpens){
-            return !in_array($item,$itemOpens);
-        });
-
-        $prodis = KampusProdi::all(['id', 'kode_prodi', 'nama']);
-
-        $itemBayars = KampusItemBayar::with(['gelombang', 'item'])
-            ->whereKampus(Session::get('id_kampus'))
-            ->where('status', 1)
-            ->get()
-            ->filter(function ($item) {
-                if (\Carbon\Carbon::parse(date('Y-m-d'))->between($item->gelombang->tanggal_mulai, $item->gelombang->tanggal_akhir) && $item->jenis != "open") {
-                    return $item;
-                }
-            })
-            ->values()
-            ->groupBy(['id_item'])
-            ->values();
-        dd($kampusMahasiswa,$itemBayars);
-
         return view('kampus.mahasiswa.edit', [
-            'prodis' => $prodis,
             'mahasiswa' => $kampusMahasiswa,
-            'itemBayars' => $itemBayars
+            'prodis' => KampusProdi::all(['id', 'kode_prodi', 'nama']),
+            'kelass' => KampusKelas::whereKampus(Session::get('id_kampus'))->get(),
+            'metode_belajars' => KampusMetodeBelajar::whereKampus(Session::get('id_kampus'))->get(),
+            'lulusans' => KampusLulusan::whereKampus(Session::get('id_kampus'))->get(),
+            'items' => KampusItemBayar::with('item')
+                        ->whereHas('gelombang',function($q){
+                            return $q->where('tanggal_mulai','>=',"2022-09-05") //$kampusMahasiswa->created_at
+                                    ->where('tanggal_akhir','>=',"2022-09-05"); //$kampusMahasiswa->created_at
+                        })
+                        ->whereKampus(Session::get('id_kampus'))
+                        ->where('status', 1)
+                        ->where('jenis','!=','open')
+                        ->orderBy('id_item')
+                        ->get()
+                        ->unique('id_item')
+                        ->pluck('item.nama'),
         ]);
     }
 
@@ -348,8 +351,8 @@ class KampusMahasiswaController extends Controller
             ->whereKampus(Session::get('id_kampus'))
             ->where('status', 1)
             ->get()
-            ->filter(function ($item) {
-                if (Carbon::parse(date('Y-m-d'))->between($item->gelombang->tanggal_mulai, $item->gelombang->tanggal_akhir) && $item->jenis == "open") {
+            ->filter(function ($item) use(&$kampusMahasiswa){
+                if ($kampusMahasiswa->created_at->between($item->gelombang->tanggal_mulai, $item->gelombang->tanggal_akhir) && $item->jenis == "open") {
                     return $item;
                 }
             })
@@ -435,6 +438,10 @@ class KampusMahasiswaController extends Controller
             }
         }
 
+        $mahasiswa->id_kelas = $request->kelas;
+        $mahasiswa->id_lulusan = $request->lulusan;
+        $mahasiswa->id_metode_belajar = $request->metode_belajar;
+
         $kampusMahasiswa->nama_lengkap = $request->nama_lengkap;
         $kampusMahasiswa->tanggal_lahir = $request->tanggal_lahir;
         $kampusMahasiswa->jenis_kelamin = $request->jenis_kelamin;
@@ -443,6 +450,24 @@ class KampusMahasiswaController extends Controller
             $id_prodi = $request->prodi;
         } else {
             $id_prodi = $mahasiswa->id_prodi;
+        }
+        if ($request->has('kelas')) {
+            $kampusMahasiswa->id_kelas = $request->kelas;
+            $id_kelas = $request->kelas;
+        } else {
+            $id_kelas = $mahasiswa->id_kelas;
+        }
+        if ($request->has('lulusan')) {
+            $kampusMahasiswa->id_lulusan = $request->lulusan;
+            $id_lulusan = $request->lulusan;
+        } else {
+            $id_lulusan = $mahasiswa->id_lulusan;
+        }
+        if ($request->has('metode_belajar')) {
+            $kampusMahasiswa->id_metode_belajar = $request->metode_belajar;
+            $id_metode_belajar = $request->metode_belajar;
+        } else {
+            $id_metode_belajar = $mahasiswa->id_metode_belajar;
         }
         if ($request->has('tanggal_pembayaran')) {
             $kampusMahasiswa->tanggal_pembayaran = $request->tanggal_pembayaran;
@@ -471,11 +496,17 @@ class KampusMahasiswaController extends Controller
         $d1 = array_diff($_item_bayar_selected, json_decode($mahasiswa->item_bayar_selected));
         // dd($_item_bayar_selected, json_decode($mahasiswa->item_bayar_selected),$d1);
 
-        DB::transaction(function () use (&$request, &$kampusMahasiswa, &$mahasiswa, &$id_prodi, &$tanggal_pembayaran, &$d1, &$_item_bayar_selected, &$data_kampus_rencana_mahasiswa) {
+        DB::transaction(function () use (&$request, &$kampusMahasiswa, &$mahasiswa, &$id_prodi,&$id_kelas,&$id_metode_belajar,&$id_lulusan, &$tanggal_pembayaran, &$d1, &$_item_bayar_selected, &$data_kampus_rencana_mahasiswa) {
             $kampusMahasiswa->save();
             $data_item_bayar_selected = collect($request->item_bayar_selected);
 
-            if ($id_prodi != $mahasiswa->id_prodi || $tanggal_pembayaran != $mahasiswa->tanggal_pembayaran || count($d1) > 0) {
+            if (
+                $id_prodi != $mahasiswa->id_prodi ||
+                $id_kelas != $mahasiswa->id_kelas ||
+                $id_metode_belajar != $mahasiswa->id_metode ||
+                $id_lulusan != $mahasiswa->id_lulusan || 
+                $tanggal_pembayaran != $mahasiswa->tanggal_pembayaran || 
+                count($d1) > 0) {
                 $data_item_bayar_selected = collect($_item_bayar_selected);
                 foreach ($data_item_bayar_selected as $item_bayar_selected) {
                     $kampus_item_bayar = KampusItemBayar::findOrFail($item_bayar_selected);
@@ -496,6 +527,7 @@ class KampusMahasiswaController extends Controller
                                     "nama" => "cicilan ke-$template_angsuran->nama",
                                     "biaya" => $template_angsuran->nominal,
                                     "tanggal_bayar" => null,
+                                    "jenis" => $kampus_item_bayar->jenis,
                                     "status" => 0,
                                     "isDelete" => 0,
                                 ]);
@@ -509,10 +541,12 @@ class KampusMahasiswaController extends Controller
                                 "nama" => "",
                                 "biaya" => $kampus_item_bayar->nominal,
                                 "tanggal_bayar" => null,
+                                "jenis" => $kampus_item_bayar->jenis,
                                 "status" => 0,
                                 "isDelete" => 0,
                             ]);
                         }
+                        
                     }
                     else{
                         $prodi = KampusProdi::findOrFail($id_prodi);
@@ -529,6 +563,7 @@ class KampusMahasiswaController extends Controller
                                     "nama" => "cicilan ke-$template_angsuran->nama",
                                     "biaya" => $template_angsuran->nominal,
                                     "tanggal_bayar" => $tanggal,
+                                    "jenis" => $kampus_item_bayar->jenis,
                                     "status" => 0,
                                     "isDelete" => 0,
                                 ]);
@@ -583,5 +618,44 @@ class KampusMahasiswaController extends Controller
                 'title' => 'Sukses',
                 'message' => 'Berhasil Menghapus Data'
             ]);
+    }
+
+    public function getData(Request $request){
+        Debugbar::disable();
+
+        dd($request->all());
+        if($request->has('id_prodi') && $request->has('id_kelas') && $request->has('id_metode_belajar') && $request->has('id_lulusan')){
+            return response()->json([
+                "status"=>200,
+                "data"=>KampusItemBayar::select('id','jumlah_angsuran','id_data_gelombang','id_item')
+                    ->with('item')
+                    ->whereHas('gelombang',function($q){
+                        return $q->where('tanggal_mulai','>=',"2022-09-05")
+                                ->where('tanggal_akhir','>=',"2022-09-05");
+                    })
+                    ->whereKampus($request->id_kampus)
+                    ->where('id_prodi', $request->id_prodi)
+                    ->where('id_kelas', $request->id_kelas)
+                    ->where('id_metode_belajar', $request->id_metode_belajar)
+                    ->where('id_lulusan', $request->id_lulusan)
+                    ->where('jenis','!=','open')
+                    ->orderBy('jumlah_angsuran')
+                    ->get()
+                    ->each(function ($item,$index) {
+                        $item->text = $item->jumlah_angsuran."x";
+                    })
+                    ->groupBy(['id_item'])
+                    ->values()
+                    ->toArray(),
+                "error"=>""
+            ]);
+        }
+        else{
+            return response()->json([
+                "status"=>500,
+                "data"=>$request->all(),
+                "error"=>"data yang dikirim tidak lengkap"
+            ]);
+        }
     }
 }

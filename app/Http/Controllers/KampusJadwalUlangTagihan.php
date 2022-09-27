@@ -42,7 +42,9 @@ class KampusJadwalUlangTagihan extends Controller
         $mahasiswas = KampusMahasiswa::with(['prodi'])->whereHas('prodi.kampus',function($q){
             return $q->where('id',Session::get('id_kampus'));
         })->get();
-        $data_tagihan = KampusTagihan::with('tagihan_detail','tagihan_detail.rencana.item_bayar.item')->where('id_mahasiswa',76)->get();
+        $data_tagihan = KampusTagihan::with('tagihan_detail','tagihan_detail.rencana.item_bayar.item')->where('id_mahasiswa',$mahasiswas->pluck('id'))->get();
+        // dd($data_tagihan);
+
         return view('kampus.jadwal_ulang.create',["mahasiswas"=>$mahasiswas,'tagihans'=>$data_tagihan]);
     }
 
