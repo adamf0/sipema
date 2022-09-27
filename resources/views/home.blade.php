@@ -91,9 +91,9 @@
                                     <h6 class="fw-semibold">Filter Penagihan</h6>
                                     <hr>
                                     <form action="{{ route('home') }}">
-                                        <label for="filter_tanggal" class="form-label">Tanggal <span class="fw-semibold">({{ \Carbon\Carbon::parse($filter_tanggal)->format('d F Y') }})</span></label>
+                                        <label for="filter_tanggal" class="form-label">Tanggal <span class="fw-semibold">({{ \Carbon\Carbon::parse($filter_tanggal ?? now())->format('d F Y') }})</span></label>
                                         <div class="d-flex flex-column flex-lg-row gap-2">
-                                            <input type="date" name="filter_tanggal" required max="{{ now()->format('Y-m-d') }}" value="{{ $filter_tanggal }}" class="form-control @error('filter_tanggal') is-invalid @enderror">
+                                            <input type="date" name="filter_tanggal" required max="{{ now()->format('Y-m-d') }}" value="{{ $filter_tanggal ?? now()->format('Y-m-d') }}" class="form-control @error('filter_tanggal') is-invalid @enderror">
                                             <button type="submit" class="btn btn-primary">
                                                 Filter
                                             </button>
