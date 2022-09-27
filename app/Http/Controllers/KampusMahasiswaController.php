@@ -31,7 +31,7 @@ class KampusMahasiswaController extends Controller //generate pertama kali hanya
      */
     public function index()
     {
-        $mahasiswas = KampusMahasiswa::whereHas('prodi', function ($query){
+        $mahasiswas = KampusMahasiswa::with(['kelas','metode_belajar','lulusan'])->whereHas('prodi', function ($query){
             $query->whereKampus(Session::get('id_kampus'));
         })->simplePaginate(5);
 

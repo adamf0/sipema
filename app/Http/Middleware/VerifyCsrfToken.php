@@ -19,6 +19,7 @@ class VerifyCsrfToken extends Middleware
      * @var array
      */
     protected $except = [
-        'getData','getDataItems'
+        // 'getData','getDataItems','kampus.mahasiswa.rencana.store'
+        '*'
     ];
 }

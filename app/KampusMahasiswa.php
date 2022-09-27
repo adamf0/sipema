@@ -34,6 +34,18 @@ class KampusMahasiswa extends Model
     {
         return $this->hasOne(KampusProdi::class, 'id', 'id_prodi');
     }
+    public function kelas()
+    {
+        return $this->hasOne(KampusKelas::class, 'id', 'id_kelas');
+    }
+    public function metode_belajar()
+    {
+        return $this->hasOne(KampusMetodeBelajar::class, 'id', 'id_metode_belajar');
+    }
+    public function lulusan()
+    {
+        return $this->hasOne(KampusLulusan::class, 'id', 'id_lulusan');
+    }
 
     public function kampusMou()
     {
