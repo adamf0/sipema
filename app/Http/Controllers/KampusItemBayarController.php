@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use Yajra\DataTables\DataTables;
 
 class KampusItemBayarController extends Controller
 {
@@ -26,20 +27,84 @@ class KampusItemBayarController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $kampusItemBayars = KampusItemBayar::whereKampus(Session::get('id_kampus'))
-                            ->with(['item','gelombang','gelombang.tahun_akademik','kelas','metode_belajar','lulusan','prodi','prodi.kampus'])
-                            ->orderBy('tahun_akademik','ASC')
-                            ->orderBy('id_item','ASC')
-                            ->orderBy('id_data_gelombang','ASC')
-                            ->get()
-                            ->each(function($item_bayar,$index){
-                                $item_bayar->template_angsuran = collect(json_decode($item_bayar->template_angsuran));
-                                $item_bayar->total_bayar = $item_bayar->template_angsuran->sum('nominal');
-                            });
+        // $kampusItemBayars = KampusItemBayar::whereKampus(Session::get('id_kampus'))
+        //                     ->with(['item','gelombang','gelombang.tahun_akademik','kelas','metode_belajar','lulusan','prodi','prodi.kampus'])
+        //                     ->orderBy('tahun_akademik','ASC')
+        //                     ->orderBy('id_item','ASC')
+        //                     ->orderBy('id_data_gelombang','ASC')
+        //                     ->get()
+                            // ->each(function($item_bayar,$index){
+                            //     $item_bayar->template_angsuran = collect(json_decode($item_bayar->template_angsuran));
+                            //     $item_bayar->total_bayar = $item_bayar->template_angsuran->sum('nominal');
+                            // });
 
-        return view('kampus.item_bayar.index',['item_bayars'=>$kampusItemBayars]);
+        if ($request->ajax()) {
+            $id_kampus = $request->id_kampus;
+            $data = KampusItemBayar::whereKampus($id_kampus)
+                                ->orderBy('tahun_akademik','ASC')
+                                ->orderBy('id_item','ASC')
+                                ->orderBy('id_data_gelombang','ASC')
+                                ->groupBy([
+                                    'tahun_akademik',
+                                    'id_data_gelombang',
+                                    'id_prodi',
+                                    'id_lulusan',
+                                    'id_kelas',
+                                    'id_metode_belajar'
+                                ])
+                                ->get()
+                                ->each(function($item,$index) use(&$id_kampus){
+                                    $item->items = KampusItemBayar::with([
+                                                        'item',
+                                                        'gelombang',
+                                                        'gelombang.tahun_akademik',
+                                                        'kelas',
+                                                        'metode_belajar',
+                                                        'lulusan',
+                                                        'prodi',
+                                                        'prodi.kampus'
+                                                    ])
+                                                    ->whereKampus($id_kampus)
+                                                    ->where([
+                                                        'tahun_akademik'=>$item->tahun_akademik,
+                                                        'id_data_gelombang'=>$item->id_data_gelombang,
+                                                        'id_prodi'=>$item->id_prodi,
+                                                        'id_lulusan'=>$item->id_lulusan,
+                                                        'id_kelas'=>$item->id_kelas,
+                                                        'id_metode_belajar'=>$item->id_metode_belajar
+                                                    ])
+                                                    ->get()
+                                                    ->each(function($item_bayar,$index){
+                                                        $item_bayar->template_angsuran = collect(json_decode($item_bayar->template_angsuran));
+                                                        $item_bayar->total_bayar = $item_bayar->template_angsuran->sum('nominal');
+                                                        $item_bayar->aksi = "<div class='d-flex gap-2'>
+                                                            <a href='" . route('kampus.item-bayar.edit', ['item-bayar' => $item_bayar->id]) . "' class='btn btn-warning btn-sm'>Edit</a>
+                                                            <form action='" . route('kampus.item-bayar.destroy', ['item-bayar' => $item_bayar->id]) . "' method='post'>
+                                                                <input type='hidden' name='_token' value='" . csrf_token() . "'>
+                                                                <input type='hidden' name='_method' value='DELETE'>
+                                                                <button type='submit' class='btn btn-danger btn-sm'>Hapus</button>
+                                                            </form>
+                                                        </div>";
+                                                    });
+                                });
+        
+            $data->load([
+                'gelombang',
+                'gelombang.tahun_akademik',
+                'kelas',
+                'metode_belajar',
+                'lulusan',
+                'prodi',
+                'prodi.kampus'
+            ]);
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->make(true);
+        }
+
+        return view('kampus.item_bayar.index');
     }
 
     /**
@@ -51,12 +116,12 @@ class KampusItemBayarController extends Controller
     {
         return view('kampus.item_bayar.create',[
             "items"=>MasterItem::all(),
-            'gelombangs'=>KampusGelombang::whereKampus(Session::get('id_kampus'))->get(),
-            'prodis'=>KampusProdi::whereKampus(Session::get('id_kampus'))->get(),
-            'metode_belajars'=>KampusMetodeBelajar::whereKampus(Session::get('id_kampus'))->get(),
-            'lulusans'=>KampusLulusan::whereKampus(Session::get('id_kampus'))->get(),
-            'kelass'=>KampusKelas::whereKampus(Session::get('id_kampus'))->get(),
-            'tahun_akademiks'=>KampusTahunAkademik::whereKampus(Session::get('id_kampus'))->get()
+            'gelombangs'=>KampusGelombang::whereKampus(Session::get('id_kampus'))->withDefaultKampus()->get(),
+            'prodis'=>KampusProdi::whereKampus(Session::get('id_kampus'))->withDefaultKampus()->get(),
+            'metode_belajars'=>KampusMetodeBelajar::whereKampus(Session::get('id_kampus'))->withDefaultKampus()->get(),
+            'lulusans'=>KampusLulusan::whereKampus(Session::get('id_kampus'))->withDefaultKampus()->get(),
+            'kelass'=>KampusKelas::whereKampus(Session::get('id_kampus'))->withDefaultKampus()->get(),
+            'tahun_akademiks'=>KampusTahunAkademik::whereKampus(Session::get('id_kampus'))->withDefaultKampus()->get()
         ]);
     }
 
@@ -231,13 +296,13 @@ class KampusItemBayarController extends Controller
 
         return view('kampus.item_bayar.edit',[
             "items"=>MasterItem::all(),
-            'gelombangs'=>KampusGelombang::whereKampus(Session::get('id_kampus'))->get(),
             'item_bayar'=>$kampusItemBayar,
-            'prodis'=>KampusProdi::whereKampus(Session::get('id_kampus'))->get(),
-            'metode_belajars'=>KampusMetodeBelajar::whereKampus(Session::get('id_kampus'))->get(),
-            'lulusans'=>KampusLulusan::whereKampus(Session::get('id_kampus'))->get(),
-            'kelass'=>KampusKelas::whereKampus(Session::get('id_kampus'))->get(),
-            'tahun_akademiks'=>KampusTahunAkademik::whereKampus(Session::get('id_kampus'))->get()
+            'gelombangs'=>KampusGelombang::whereKampus(Session::get('id_kampus'))->withDefaultKampus()->where('id','!=',1)->get(),
+            'prodis'=>KampusProdi::whereKampus(Session::get('id_kampus'))->withDefaultKampus()->where('id','!=',1)->get(),
+            'metode_belajars'=>KampusMetodeBelajar::whereKampus(Session::get('id_kampus'))->withDefaultKampus()->where('id','!=',1)->get(),
+            'lulusans'=>KampusLulusan::whereKampus(Session::get('id_kampus'))->withDefaultKampus()->where('id','!=',1)->get(),
+            'kelass'=>KampusKelas::whereKampus(Session::get('id_kampus'))->withDefaultKampus()->where('id','!=',1)->get(),
+            'tahun_akademiks'=>KampusTahunAkademik::whereKampus(Session::get('id_kampus'))->withDefaultKampus()->where('id','!=',1)->get()
         ]);
     }
 

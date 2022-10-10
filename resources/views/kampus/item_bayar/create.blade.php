@@ -49,7 +49,7 @@
                     <select class="form-select" name="id_prodi" id="id_prodi" required>
                         <option value="">Pilih Prodi</option>
                         @foreach ($prodis as $prodi)
-                            <option value="{{ $prodi->id }}">{{ ucwords($prodi->nama) }} ({{ ucwords($prodi->jenjang->nama) }})</option>
+                            <option value="{{ $prodi->id }}">{{ ucwords($prodi->nama) }} @if($prodi->id!=1) ({{ ucwords($prodi->jenjang->nama) }}) @endif</option>
                         @endforeach
                     </select>
                 </div>

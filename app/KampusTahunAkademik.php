@@ -29,6 +29,11 @@ class KampusTahunAkademik extends Model
             return $query->where('id_kampus',$id_kampus);
         }
     }
+    public function scopeWithDefaultKampus($query)
+    {
+        return $query->orWhere('id_kampus',null);
+    }
+    
     public function gelombang()
     {
         return $this->belongsTo(KampusGelombang::class,'id_tahun_akademik','id');

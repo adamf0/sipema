@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\MasterItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\DataTables;
 
 class KampusItemController extends Controller
 {
@@ -13,13 +14,37 @@ class KampusItemController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $masterItems = MasterItem::simplePaginate(5);
+        if ($request->ajax()) {
+            $data = MasterItem::all();
+            return Datatables::of($data)
+                ->filter(function ($query) {
+                    if (request()->has('nama')) {
+                        $query->where('nama', 'like', "%" . request('nama') . "%");
+                    }
 
-        return view('kampus.item.index', [
-            'masterItems' => $masterItems
-        ]);
+                    if (request()->has('id')) {
+                        $query->where('id', 'like', "%" . request('id') . "%");
+                    }
+                },true)
+                ->addIndexColumn()
+                ->addColumn('aksi', function ($row) {
+                    $actionBtn = "<div class='d-flex gap-2'>
+                                    <a href='" . route('kampus.item.edit', ['master_item' => $row->id]) . "' class='btn btn-warning btn-sm'>Edit</a>
+                                    <form action='" . route('kampus.item.destroy', ['master_item' => $row->id]) . "' method='post'>
+                                        <input type='hidden' name='_token' value='" . csrf_token() . "'>
+                                        <input type='hidden' name='_method' value='DELETE'>
+                                        <button type='submit' class='btn btn-danger btn-sm'>Hapus</button>
+                                    </form>
+                                </div>";
+                    return $actionBtn;
+                })
+                ->rawColumns(['aksi'])
+                ->make(true);
+        }
+
+        return view('kampus.item.index');
     }
 
     /**

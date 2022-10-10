@@ -3,76 +3,133 @@
 @section('page-title', 'Mahasiswa')
 
 @section('content')
-    <div class="d-flex mb-2">
-        <a href="{{ route('kampus.mahasiswa.create') }}" class="btn btn-primary">Tambah</a>
-        <a href="{{ route('kampus.mahasiswa.rencana.create') }}" class="btn btn-secondary mx-2">Tambah Rincian Pembayaran</a>
-    </div>
-    <div class="w-100 overflow-auto">
-        <table class="table table-responsive table-bordered">
-            <thead class="table-light">
-                <tr>
-                    <th>ID</th>
-                    <th>NIM</th>
-                    <th>NIM Sementara</th>
-                    <th>Nama Lengkap</th>
-                    <th>Tanggal Lahir</th>
-                    <th>Jenis Kelamin</th>
-                    <th>Prodi</th>
-                    <th>Kelas</th>
-                    <th>Metode Belajar</th>
-                    <th>Lulusan</th>
-                    <th>Tanggal Pembayaran</th>
-                    <th>No. MOU</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($mahasiswas as $mahasiswa)
-                    <tr>
-                        <th>{{ $mahasiswa->id }}</th>
-                        <td>{{ $mahasiswa->nim }}</td>
-                        <td>{{ $mahasiswa->nim_sementara }}</td>
-                        <td>{{ $mahasiswa->nama_lengkap }}</td>
-                        <td>{{ $mahasiswa->tanggal_lahir }}</td>
-                        <td>
-                            @if ($mahasiswa->jenis_kelamin == '1')
-                                Laki - Laki
-                            @else
-                                Perempuan
-                            @endif
-                        </td>
-                        <td>
-                            {{ $mahasiswa->prodi->nama }}
-                            ({{ $mahasiswa->prodi->jenjang->nama }})
-                        </td>
-                        <td>{{ $mahasiswa->kelas->nama }}</td>
-                        <td>{{ $mahasiswa->metode_belajar->nama }}</td>
-                        <td>{{ $mahasiswa->lulusan->nama }}</td>
-                        <td>{{ $mahasiswa->tanggal_pembayaran }}</td>
-                        <td>{{ $mahasiswa->kampusMou->no_mou ?? 'Tidak Ditemukan' }}</td>
-                        <td>
-                            <div class="d-flex gap-2">
-                                <a href="{{ route('kampus.mahasiswa.show', ['mahasiswa' => $mahasiswa->id]) }}" class="btn btn-primary btn-sm">Rencana</a>
-                                <a href="{{ route('kampus.mahasiswa.edit', ['mahasiswa' => $mahasiswa->id]) }}" class="btn btn-warning btn-sm">Edit</a>
-                                <form action="{{ route('kampus.mahasiswa.destroy', ['mahasiswa' => $mahasiswa->id]) }}" method="post">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="10" class="text-center">
-                            Data Kosong
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-    <div class="d-flex justify-content-center">
-        {{ $mahasiswas->links() }}
-    </div>
+<div class="d-flex mb-2">
+    <a href="{{ route('kampus.mahasiswa.create') }}" class="btn btn-primary">Tambah</a>
+    <a href="{{ route('kampus.mahasiswa.rencana.create') }}" class="btn btn-secondary mx-2">Tambah Rincian Pembayaran</a>
+</div>
+<div class="w-100 overflow-auto">
+    <table id="example" class="table table-responsive table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>#</th>
+                <th>NIM</th>
+                <th>NIM Sementara</th>
+                <th>Nama Lengkap</th>
+                <th>Tanggal Lahir</th>
+                <th>Jenis Kelamin</th>
+                <th>Prodi</th>
+                <th>Kelas</th>
+                <th>Metode Belajar</th>
+                <th>Lulusan</th>
+                <th>Tanggal Pembayaran</th>
+                <th>No. MOU</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
 @endsection
+
+@push('js')
+<script>
+    // function format ( d ) {
+    //     return '<table>'+
+    //         '<tr>'+
+    //             '<td>Full name:</td>'+
+    //             '<td>'+d.nama+'</td>'+
+    //         '</tr>'+
+    //         '<tr>'+
+    //             '<td>Extra info:</td>'+
+    //             '<td>And any further details here (images etc)...</td>'+
+    //         '</tr>'+
+    //     '</table>';
+    // }
+
+    $(document).ready(function() {
+        let i = 1;
+        var table = $('#example').DataTable({
+            ajax: {
+                url: '{{ route("kampus.mahasiswa.index") }}',
+                type: 'POST',
+                data: {
+                    "id_kampus": <?php echo Session::get("id_kampus"); ?>
+                }
+            },
+            processing: true,
+            serverSide: true,
+            columns: [{
+                    data: null,
+                    defaultContent: ''
+                },
+                {
+                    data: "nim",
+                    render: function(data) {
+                        return data == null ? "-" : data;
+                    }
+                },
+                {
+                    data: "nim_sementara"
+                },
+                {
+                    data: "nama_lengkap"
+                },
+                {
+                    data: "tanggal_lahir"
+                },
+                {
+                    data: "jenis_kelamin",
+                    render: function(data) {
+                        return data == 1 ? "Laki-laki" : "Perempuan";
+                    }
+                },
+                {
+                    data: "prodi",
+                    render: function(data) {
+                        return `
+                        ${data.nama}
+                        (${data.jenjang.nama})
+                        `;
+                    }
+                },
+                {
+                    data: "kelas.nama"
+                },
+                {
+                    data: "metode_belajar.nama"
+                },
+                {
+                    data: "lulusan.nama"
+                },
+                {
+                    data: "tanggal_pembayaran"
+                },
+                {
+                    data: "kampusMou.no_mou",
+                    render: function(data) {
+                        return data == null ? 'Tidak Ditemukan' : data;
+                    }
+                },
+                {
+                    data: "aksi"
+                }
+            ]
+            // "order": [[1, 'asc']]
+        });
+
+        // $('#example tbody').on('click', 'td.details-control', function () {
+        //     var tr = $(this).closest('tr');
+        //     var row = table.row( tr );
+
+        //     if ( row.child.isShown() ) {
+        //         row.child.hide();
+        //         tr.removeClass('shown');
+        //     }
+        //     else {
+        //         row.child( format(row.data()) ).show();
+        //         tr.addClass('shown');
+        //     }
+        // } );
+    });
+</script>
+@endpush

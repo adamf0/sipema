@@ -70,7 +70,7 @@ class KampusMahasiswaExtController extends Controller
             }
             else{
                 array_push($data_kampus_rencana_mahasiswa, [
-                    "id_mahasiswa" => $kampus_item_bayar->id,
+                    "id_mahasiswa" => $kampusMahasiswa->id,
                     "id_item_bayar" => $request->item_bayars,
                     "id_biaya_potongan" => null,
                     "nama" => "",
@@ -113,6 +113,7 @@ class KampusMahasiswaExtController extends Controller
 
         $kampusMahasiswa->item_bayar_selected = json_encode($new_item_bayar_selected);
 
+        // dd($kampusMahasiswa,$data_kampus_rencana_mahasiswa);
         DB::transaction(function () use (&$kampusMahasiswa, &$data_kampus_rencana_mahasiswa) {
             $kampusMahasiswa->save();
             KampusRencanaMahasiswa::insert($data_kampus_rencana_mahasiswa);

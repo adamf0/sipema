@@ -7,6 +7,7 @@ use App\KampusTahunAkademik;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\DataTables;
 
 class KampusGelombangController extends Controller
 {
@@ -18,9 +19,28 @@ class KampusGelombangController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('kampus.gelombang.index', ['gelombangs' => KampusGelombang::with('tahun_akademik')->whereKampus(Session::get('id_kampus'))->simplePaginate(5)]);
+        if ($request->ajax()) {
+            $data = KampusGelombang::with('tahun_akademik')->whereKampus(Session::get('id_kampus'))->get();
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('aksi', function ($row) {
+                    $actionBtn = "<div class='d-flex gap-2'>
+                                    <a href='" . route('kampus.gelombang.edit', ['kampus_gelombang' => $row->id]) . "' class='btn btn-warning btn-sm'>Edit</a>
+                                    <form action='" . route('kampus.gelombang.destroy', ['kampus_gelombang' => $row->id]) . "' method='post'>
+                                        <input type='hidden' name='_token' value='" . csrf_token() . "'>
+                                        <input type='hidden' name='_method' value='DELETE'>
+                                        <button type='submit' class='btn btn-danger btn-sm'>Hapus</button>
+                                    </form>
+                                </div>";
+                    return $actionBtn;
+                })
+                ->rawColumns(['aksi'])
+                ->make(true);
+        }
+
+        return view('kampus.gelombang.index');
     }
 
     /**
@@ -30,7 +50,7 @@ class KampusGelombangController extends Controller
      */
     public function create()
     {
-        return view('kampus.gelombang.create',["tahun_akademiks"=>KampusTahunAkademik::whereKampus(Session::get('id_kampus'))->get()]);
+        return view('kampus.gelombang.create', ["tahun_akademiks" => KampusTahunAkademik::whereKampus(Session::get('id_kampus'))->get()]);
     }
 
     /**
@@ -49,7 +69,7 @@ class KampusGelombangController extends Controller
                 'tanggal_akhir'
             ]),
             [
-                'nama_gelombang' => ['required','unique:kampus_data_gelombang,nama_gelombang'],
+                'nama_gelombang' => ['required', 'unique:kampus_data_gelombang,nama_gelombang'],
                 'tahun_akademik' => ['required'],
                 'tanggal_mulai' => ['required', 'date'],
                 'tanggal_akhir' => ['required', 'date'],
@@ -112,7 +132,7 @@ class KampusGelombangController extends Controller
     {
         return view('kampus.gelombang.edit', [
             'gelombang' => $kampusGelombang,
-            'tahun_akademiks'=> KampusTahunAkademik::whereKampus(Session::get('id_kampus'))->get()
+            'tahun_akademiks' => KampusTahunAkademik::whereKampus(Session::get('id_kampus'))->get()
         ]);
     }
 
@@ -133,7 +153,7 @@ class KampusGelombangController extends Controller
                 'tanggal_akhir'
             ]),
             [
-                'nama_gelombang' => ['required','unique:kampus_data_gelombang,nama_gelombang'],
+                'nama_gelombang' => ['required', 'unique:kampus_data_gelombang,nama_gelombang'],
                 'tahun_akademik' => ['required'],
                 'tanggal_mulai' => ['required', 'date'],
                 'tanggal_akhir' => ['required', 'date'],

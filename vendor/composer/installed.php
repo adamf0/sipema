@@ -1,11 +1,11 @@
 <?php return array(
     'root' => array(
-        'pretty_version' => 'dev-master',
-        'version' => 'dev-master',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '8c4db0b83de117764dc36f36e821b4307a7a7cfd',
+        'reference' => 'a997f9a44d216ff039070f47659e29d91baf299b',
         'name' => 'laravel/laravel',
         'dev' => true,
     ),
@@ -341,12 +341,12 @@
             'dev_requirement' => false,
         ),
         'laravel/laravel' => array(
-            'pretty_version' => 'dev-master',
-            'version' => 'dev-master',
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '8c4db0b83de117764dc36f36e821b4307a7a7cfd',
+            'reference' => 'a997f9a44d216ff039070f47659e29d91baf299b',
             'dev_requirement' => false,
         ),
         'laravel/tinker' => array(
@@ -1018,6 +1018,15 @@
             'aliases' => array(),
             'reference' => 'bafc69caeb4d49c39fd0779086c03a3738cbb389',
             'dev_requirement' => true,
+        ),
+        'yajra/laravel-datatables-oracle' => array(
+            'pretty_version' => 'v9.21.2',
+            'version' => '9.21.2.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../yajra/laravel-datatables-oracle',
+            'aliases' => array(),
+            'reference' => 'a7fd01f06282923e9c63fa27fe6b391e21dc321a',
+            'dev_requirement' => false,
         ),
     ),
 );

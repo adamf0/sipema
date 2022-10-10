@@ -3,45 +3,77 @@
 @section('page-title', 'Metode Belajar')
 
 @section('content')
-    <div class="d-flex justify-content-between mb-2">
-        <a href="{{ route('kampus.metode_belajar.create') }}" class="btn btn-primary">Tambah</a>
-    </div>
-    <div class="w-100 overflow-auto">
-        <table class="table table-responsive table-bordered">
-            <thead class="table-light">
-                <tr>
-                    <th>ID</th>
-                    <th>Metode Belajar</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($kampusMetodes as $kampusMetode)
-                    <tr>
-                        <th>{{ $kampusMetode->id }}</th>
-                        <td>{{ $kampusMetode->nama }}</td>
-                        <td>
-                            <div class="d-flex gap-2">
-                                <a href="{{ route('kampus.metode_belajar.edit', ['metode_belajar' => $kampusMetode->id]) }}" class="btn btn-warning btn-sm">Edit</a>
-                                <form action="{{ route('kampus.metode_belajar.destroy', ['metode_belajar' => $kampusMetode->id]) }}" method="post">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="10" class="text-center">
-                            Data Kosong
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-    <div class="d-flex justify-content-center">
-        {{ $kampusMetodes->links() }}
-    </div>
+<div class="d-flex justify-content-between mb-2">
+    <a href="{{ route('kampus.metode_belajar.create') }}" class="btn btn-primary">Tambah</a>
+</div>
+<div class="w-100 overflow-auto">
+    <table id="example" class="table table-responsive table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>#</th>
+                <th>Metode Belajar</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody< /tbody>
+    </table>
+</div>
 @endsection
+
+@push('js')
+<script>
+    // function format ( d ) {
+    //     return '<table>'+
+    //         '<tr>'+
+    //             '<td>Full name:</td>'+
+    //             '<td>'+d.nama+'</td>'+
+    //         '</tr>'+
+    //         '<tr>'+
+    //             '<td>Extra info:</td>'+
+    //             '<td>And any further details here (images etc)...</td>'+
+    //         '</tr>'+
+    //     '</table>';
+    // }
+
+    $(document).ready(function() {
+        let i = 1;
+        var table = $('#example').DataTable({
+            ajax: {
+                url: '{{ route("kampus.metode_belajar.index") }}',
+                type: 'POST',
+                data: {
+                    id_kampus: <?php echo Session::get("id_kampus"); ?>
+                }
+            },
+            processing: true,
+            serverSide: true,
+            columns: [{
+                    data: null,
+                    defaultContent: ''
+                },
+                {
+                    data: "nama"
+                },
+                {
+                    data: "aksi"
+                }
+            ]
+            // "order": [[1, 'asc']]
+        });
+
+        // $('#example tbody').on('click', 'td.details-control', function () {
+        //     var tr = $(this).closest('tr');
+        //     var row = table.row( tr );
+
+        //     if ( row.child.isShown() ) {
+        //         row.child.hide();
+        //         tr.removeClass('shown');
+        //     }
+        //     else {
+        //         row.child( format(row.data()) ).show();
+        //         tr.addClass('shown');
+        //     }
+        // } );
+    });
+</script>
+@endpush

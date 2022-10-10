@@ -23,6 +23,10 @@ class KampusGelombang extends Model
             return $query->where('id_kampus',$id_kampus);
         }
     }
+    public function scopeWithDefaultKampus($query)
+    {
+        return $query->orWhere('id_kampus',null);
+    }
     
     public function item_bayar()
     {

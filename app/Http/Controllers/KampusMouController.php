@@ -7,6 +7,7 @@ use App\MasterKampus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\DataTables;
 
 class KampusMouController extends Controller
 {
@@ -20,13 +21,27 @@ class KampusMouController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $kampusMous = KampusMou::whereKampus(Session::get('id_kampus'))->simplePaginate(5);
-
-        return view('kampus.mou.index', [
-            'kampusMous' => $kampusMous
-        ]);
+        if ($request->ajax()) {
+            $data = KampusMou::whereKampus(Session::get('id_kampus'))->get();
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('aksi', function ($row) {
+                    $actionBtn = "<div class='d-flex gap-2'>
+                                    <a href='" . route('kampus.mou.edit', ['kampus_mou' => $row->id]) . "' class='btn btn-warning btn-sm'>Edit</a>
+                                    <form action='" . route('kampus.mou.destroy', ['kampus_mou' => $row->id]) . "' method='post'>
+                                        <input type='hidden' name='_token' value='" . csrf_token() . "'>
+                                        <input type='hidden' name='_method' value='DELETE'>
+                                        <button type='submit' class='btn btn-danger btn-sm'>Hapus</button>
+                                    </form>
+                                </div>";
+                    return $actionBtn;
+                })
+                ->rawColumns(['aksi'])
+                ->make(true);
+        }
+        return view('kampus.mou.index');
     }
 
     /**
@@ -207,25 +222,25 @@ class KampusMouController extends Controller
             ]);
     }
 
-    public function change($id){
+    public function change($id)
+    {
         $kampusMou = KampusMou::findOrFail($id);
         $kampusMou->status = 1;
 
-        if(KampusMou::where('id','!=',$kampusMou->id)->update(["status"=>0]) && $kampusMou->save()){
+        if (KampusMou::where('id', '!=', $kampusMou->id)->update(["status" => 0]) && $kampusMou->save()) {
             return redirect(route('kampus.mou.index'))
-            ->with('flash_message', (object)[
-                'type' => 'success',
-                'title' => 'Sukses',
-                'message' => 'Berhasil Merubah Status'
-            ]);
-        }
-        else{
+                ->with('flash_message', (object)[
+                    'type' => 'success',
+                    'title' => 'Sukses',
+                    'message' => 'Berhasil Merubah Status'
+                ]);
+        } else {
             return redirect(route('kampus.mou.index'))
-            ->with('flash_message', (object)[
-                'type' => 'danger',
-                'title' => 'Danger',
-                'message' => 'Gagal Merubah Status'
-            ]);
+                ->with('flash_message', (object)[
+                    'type' => 'danger',
+                    'title' => 'Danger',
+                    'message' => 'Gagal Merubah Status'
+                ]);
         }
     }
 }

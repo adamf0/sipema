@@ -8,23 +8,40 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\DataTables;
 
 class KampusProdiController extends Controller
 {
     public function __construct()
     {
-
     }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $prodis = KampusProdi::with('jenjang')->whereKampus(Session::get('id_kampus'))->simplePaginate(5);
+        if ($request->ajax()) {
+            $data = KampusProdi::with('jenjang')->whereKampus(Session::get('id_kampus'))->where('id', '!=', 1)->get();
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('aksi', function ($row) {
+                    $actionBtn = "<div class='d-flex gap-2'>
+                                    <a href='" . route('kampus.kelas.edit', ['kampus_kelas' => $row->id]) . "' class='btn btn-warning btn-sm'>Edit</a>
+                                    <form action='" . route('kampus.kelas.destroy', ['kampus_kelas' => $row->id]) . "' method='post'>
+                                        <input type='hidden' name='_token' value='" . csrf_token() . "'>
+                                        <input type='hidden' name='_method' value='DELETE'>
+                                        <button type='submit' class='btn btn-danger btn-sm'>Hapus</button>
+                                    </form>
+                                </div>";
+                    return $actionBtn;
+                })
+                ->rawColumns(['aksi'])
+                ->make(true);
+        }
 
-        return view('kampus.prodi.index', ['prodis' => $prodis]);
+        return view('kampus.prodi.index');
     }
 
     /**
@@ -34,7 +51,7 @@ class KampusProdiController extends Controller
      */
     public function create()
     {
-        return view('kampus.prodi.create',["jenjangs"=>MasterJenjang::all()]);
+        return view('kampus.prodi.create', ["jenjangs" => MasterJenjang::all()]);
     }
 
     /**
@@ -116,7 +133,7 @@ class KampusProdiController extends Controller
     {
         return view('kampus.prodi.edit', [
             'prodi' => $kampusProdi,
-            'jenjangs'=>MasterJenjang::all()
+            'jenjangs' => MasterJenjang::all()
         ]);
     }
 

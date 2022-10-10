@@ -1,0 +1,67 @@
+@push('js')
+    <script>
+        // function format ( d ) {
+        //     return '<table>'+
+        //         '<tr>'+
+        //             '<td>Full name:</td>'+
+        //             '<td>'+d.nama+'</td>'+
+        //         '</tr>'+
+        //         '<tr>'+
+        //             '<td>Extra info:</td>'+
+        //             '<td>And any further details here (images etc)...</td>'+
+        //         '</tr>'+
+        //     '</table>';
+        // }
+        
+        $(document).ready(function() {
+            var table = $('#example').DataTable( {
+                ajax: {
+                    url: '{{ route("api.item") }}',
+                    type: 'GET'
+                },
+                processing: true,
+                serverSide: true,
+                columns: [
+                    {
+                        className:      'details-control',
+                        orderable:      false,
+                        data:           null,
+                        defaultContent: ''
+                    },
+                    { data: "nama" },
+                    {
+                        className: "",
+                        data: "id",
+                        render: function (data, type, row) {
+                            return `
+                            <div class="d-flex gap-2">
+                                <a href="{{ route('kampus.item.edit', ['master_item' => `+row.id+`]) }}" class="btn btn-warning btn-sm">Edit</a>
+                                <form action="{{ route('kampus.item.destroy', ['master_item' => `+row.id+`]) }}" method="post">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                                </form>
+                            </div>
+                            `;
+                        }
+                    }
+                ]
+                // "order": [[1, 'asc']]
+            } );
+            
+            // $('#example tbody').on('click', 'td.details-control', function () {
+            //     var tr = $(this).closest('tr');
+            //     var row = table.row( tr );
+        
+            //     if ( row.child.isShown() ) {
+            //         row.child.hide();
+            //         tr.removeClass('shown');
+            //     }
+            //     else {
+            //         row.child( format(row.data()) ).show();
+            //         tr.addClass('shown');
+            //     }
+            // } );
+        } );
+    </script>
+@endpush

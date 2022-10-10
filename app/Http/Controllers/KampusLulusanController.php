@@ -7,6 +7,7 @@ use App\MasterJenjang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\DataTables;
 
 class KampusLulusanController extends Controller
 {
@@ -15,8 +16,26 @@ class KampusLulusanController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        if ($request->ajax()) {
+            $data = KampusLulusan::with('jenjang')->where('id', '!=', 1)->get();
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('aksi', function ($row) {
+                    $actionBtn = "<div class='d-flex gap-2'>
+                                    <a href='" . route('kampus.lulusan.edit', ['kampus_lulusan' => $row->id]) . "' class='btn btn-warning btn-sm'>Edit</a>
+                                    <form action='" . route('kampus.lulusan.destroy', ['kampus_lulusan' => $row->id]) . "' method='post'>
+                                        <input type='hidden' name='_token' value='" . csrf_token() . "'>
+                                        <input type='hidden' name='_method' value='DELETE'>
+                                        <button type='submit' class='btn btn-danger btn-sm'>Hapus</button>
+                                    </form>
+                                </div>";
+                    return $actionBtn;
+                })
+                ->rawColumns(['aksi'])
+                ->make(true);
+        }
         return view('kampus.lulusan.index', [
             'kampusLulusan' => KampusLulusan::with('jenjang')->simplePaginate(5)
         ]);
@@ -29,7 +48,7 @@ class KampusLulusanController extends Controller
      */
     public function create()
     {
-        return view('kampus.lulusan.create',['jenjangs'=>MasterJenjang::all()]);
+        return view('kampus.lulusan.create', ['jenjangs' => MasterJenjang::all()]);
     }
 
     /**
@@ -101,7 +120,7 @@ class KampusLulusanController extends Controller
      */
     public function edit(KampusLulusan $kampus_lulusan)
     {
-        return view('kampus.lulusan.edit',['lulusan'=>$kampus_lulusan,"jenjangs"=>MasterJenjang::all()]);
+        return view('kampus.lulusan.edit', ['lulusan' => $kampus_lulusan, "jenjangs" => MasterJenjang::all()]);
     }
 
     /**

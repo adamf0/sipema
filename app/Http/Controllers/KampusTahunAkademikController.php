@@ -6,6 +6,7 @@ use App\KampusTahunAkademik;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\DataTables;
 
 class KampusTahunAkademikController extends Controller
 {
@@ -14,9 +15,28 @@ class KampusTahunAkademikController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('kampus.tahun_akademik.index',["tahun_akademiks"=>KampusTahunAkademik::whereKampus(Session::get('id_kampus'))->simplePaginate(5)]);
+        if ($request->ajax()) {
+            $data = KampusTahunAkademik::whereKampus(Session::get('id_kampus'))->where('id', '!=', 1)->get();
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('aksi', function ($row) {
+                    $actionBtn = "<div class='d-flex gap-2'>
+                                    <a href='" . route('kampus.tahun_akademik.edit', ['tahun_akademik' => $row->id]) . "' class='btn btn-warning btn-sm'>Edit</a>
+                                    <form action='" . route('kampus.tahun_akademik.destroy', ['tahun_akademik' => $row->id]) . "' method='post'>
+                                        <input type='hidden' name='_token' value='" . csrf_token() . "'>
+                                        <input type='hidden' name='_method' value='DELETE'>
+                                        <button type='submit' class='btn btn-danger btn-sm'>Hapus</button>
+                                    </form>
+                                </div>";
+                    return $actionBtn;
+                })
+                ->rawColumns(['aksi'])
+                ->make(true);
+        }
+
+        return view('kampus.tahun_akademik.index');
     }
 
     /**
@@ -98,7 +118,7 @@ class KampusTahunAkademikController extends Controller
      */
     public function edit(KampusTahunAkademik $kampus_tahun_akademik)
     {
-        return view('kampus.tahun_akademik.edit',["tahun_akademik"=>$kampus_tahun_akademik]);
+        return view('kampus.tahun_akademik.edit', ["tahun_akademik" => $kampus_tahun_akademik]);
     }
 
     /**
